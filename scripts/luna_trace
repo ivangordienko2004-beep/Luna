@@ -1,0 +1,1 @@
+python3 $LUNA_HOME/scripts/trace/trace.py id.*.map.list pending.*.json.list cf.*.json.list $@
