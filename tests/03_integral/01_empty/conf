@@ -1,0 +1,4 @@
+RUN=$LUNA_HOME/bin/parser
+RETCODE=1
+STDOUT_EMPTY
+STDERR_MATCH=fatal error: no program specified

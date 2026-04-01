@@ -1,0 +1,4 @@
+RUN=luna -q Model3DTaskConvProgonka.fa ""
+RETCODE=0
+STDERR_EMPTY
+STDOUT_EMPTY

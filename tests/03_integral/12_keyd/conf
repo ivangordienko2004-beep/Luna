@@ -1,0 +1,4 @@
+RUN=luna -q -D TEST=test input.fa
+RETCODE=0
+STDERR_EMPTY
+STDOUT=output.txt

@@ -1,0 +1,23 @@
+C++ head
+${<END}
+#include <cstdio>
+END
+
+C++ sub show(string caption, int number)
+${<END} {
+	printf("%s%d\n", caption, number);
+} END
+
+sub main()
+{
+	for i=1..3
+            show("i = " + i + " : -i = ", -i) @ { locator_cyclic: 1; };
+	for i=1..3
+            show("i = " + i + " : --i = ", --i) @ { locator_cyclic: 1; };
+	for i=1..3
+            show("i = " + i + " : -1--i--1 = ", -1--i--1) @ { locator_cyclic: 1; };
+	for i=1..3
+            show("i = " + i + " : i---i = ", i---i) @ { locator_cyclic: 1; };
+	for i=1..3
+            show("i = " + i + " : -i*-i+-1 = ", -i*-i+-1) @ { locator_cyclic: 1; };
+}

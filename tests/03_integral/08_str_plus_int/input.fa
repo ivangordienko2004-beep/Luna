@@ -1,0 +1,18 @@
+#!/usr/bin/luna
+
+C++ sub print(string what) ${<!}
+{
+	printf("%s\n", what);
+}!
+
+C++ sub assign_int(name x, int val) ${<#}
+{
+	x.setValue<int>(val);
+}#
+
+sub main()
+{
+	df x;
+	assign_int(x, 7);
+	print("valid string " + x);
+}

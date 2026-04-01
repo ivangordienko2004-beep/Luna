@@ -1,0 +1,4 @@
+RUN=luna -q ternary.fa
+RETCODE=0
+STDERR_EMPTY
+STDOUT=output.txt

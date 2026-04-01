@@ -1,0 +1,11 @@
+#!/usr/bin/luna
+
+C++ sub main()
+${<END}
+{
+	printf("H\"el//lo,\" World\n"); // single "line"
+	printf("Hel/*lo, Wo*/rld!\n");
+	/* and remove */ /*some
+}$} multiline
+comments */
+}END

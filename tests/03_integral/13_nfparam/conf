@@ -1,0 +1,3 @@
+RUN=luna -q nfparam.fa
+RETCODE=1
+STDERR_MATCH=recom-generation

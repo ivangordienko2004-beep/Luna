@@ -1,0 +1,5 @@
+RUN=luna -q input.fa
+RETCODE=1
+STDOUT_EMPTY
+STDERR_MATCH=invalid operation.*input.fa:13:11:$
+

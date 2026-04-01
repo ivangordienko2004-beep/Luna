@@ -1,0 +1,2 @@
+RUN=luna -q basic2.fa
+RETCODE=0

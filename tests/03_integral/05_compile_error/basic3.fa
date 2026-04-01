@@ -1,0 +1,23 @@
+#!/usr/bin/luna
+
+C++ sub empty() ${<!}{}!
+
+C++ sub ok(int n) ${<!}{ printf("OK %d\n", n);}!
+
+sub f(int it, int n)
+{
+	ok(it) --> (n);
+}
+
+sub main()
+{
+	df N;
+
+	for it=1..10 {
+		empty() >> (N[it]);
+
+		if (N[it]) {
+			f(it, N[it]);
+		}
+	}
+}

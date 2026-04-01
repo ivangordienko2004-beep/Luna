@@ -1,0 +1,12 @@
+#!/usr/bin/luna
+
+sub main()
+{
+	test();
+}
+/*
+	some comments
+	*/ C++ sub test() ${{
+	printf("Hello, single file!\n");
+$}}
+

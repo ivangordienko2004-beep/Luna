@@ -1,0 +1,16 @@
+#!/usr/bin/luna
+
+C++ sub print(string what) ${<!}
+{
+	printf("%s\n", what);
+}!
+
+sub main()
+{
+	print("valid string");
+	print("valid string " + 2);
+	
+	if ("123">="345345") {
+		print("invalid");
+	}
+}

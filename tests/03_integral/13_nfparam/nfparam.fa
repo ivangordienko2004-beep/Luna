@@ -1,0 +1,20 @@
+import c_iprint(int) as iprint;
+
+sub print_nfparam() {
+    iprint(n3);
+    iprint(n2);
+    iprint(n1);
+} @ {
+    nfparam n1;
+    nfparam n2;
+    nfparam n3;
+}
+
+sub main() {
+
+    cf b: print_nfparam() @ {
+        nfparam n3 => 3;
+        nfparam n1 => 1;
+        nfparam n2 => 2;
+    };
+}

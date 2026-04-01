@@ -1,0 +1,11 @@
+#!/usr/bin/luna
+
+sub main()
+{
+	// define -D TEST=test
+	$TEST();
+}
+C++ sub test() ${{
+	printf("Hello, -D!\n");
+$}}
+

@@ -1,0 +1,60 @@
+import c_init(name, int) as init;
+import c_iprint(int) as iprint;
+
+sub print_array(name y) {
+    iprint(y[0]);
+    iprint(y[1]);
+    iprint(y[2]);
+    iprint(y[3]);
+} @ {
+    locator_cyclic y[i] => n1;
+    nfparam n1;
+    nfparam n2;
+}
+
+sub sum_vectors(name x, name y, name z, int from_index, int to_index) {
+    for i = from_index .. to_index
+        cf a: init(z[i], x[i] + y[i]);
+} @ {
+    nfparam n1;
+    nfparam n2;
+    nfparam n3;
+    locator_cyclic x[i] => n1;
+    locator_cyclic y[i] => n2;
+    locator_cyclic z[i] => n3;
+}
+
+sub main() {
+    df x, y, z;
+
+    cf a: init(x[0], 0);
+    cf a: init(x[1], 1);
+    cf a: init(x[2], 2);
+    cf a: init(x[3], 3);
+
+    cf a: init(y[0], 3);
+    cf a: init(y[1], 2);
+    cf a: init(y[2], 1);
+    cf a: init(y[3], 0);
+
+    cf b: sum_vectors(x, y, z, 0, 1) @ {
+        nfparam n1 => 1;
+        nfparam n2 => 2;
+        nfparam n3 => 3;
+    };
+
+    cf b: sum_vectors(x, y, z, 2, 3) @ {
+        nfparam n1 => 1;
+        nfparam n2 => 2;
+        nfparam n3 => 3;
+    };
+
+    cf b: print_array(z) @ {
+        nfparam n2 => 1;
+        nfparam n1 => 3;
+    };
+} @ {
+    locator_cyclic x[i] => 1;
+    locator_cyclic y[i] => 2;
+    locator_cyclic z[i] => 3;
+}

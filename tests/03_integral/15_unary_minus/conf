@@ -1,0 +1,4 @@
+RUN=luna --worker-threads-count=1 -q basic.fa
+RETCODE=0
+STDERR_EMPTY
+STDOUT=output.txt

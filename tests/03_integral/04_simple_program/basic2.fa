@@ -1,0 +1,16 @@
+#!/usr/bin/luna
+C++ head
+${<END}
+#include <cstdio>
+END
+
+C++ sub show(string caption, int number)
+${<END} {
+	printf("%s: %d\n", caption, number);
+} END
+
+sub main()
+{
+	for i=1..10
+		show("i", i);
+}
