@@ -1,0 +1,5 @@
+RUN=luna -q -g mxm.fa
+RETCODE=1
+STDOUT_EMPTY
+STDERR_MATCH=System is idle, but unfinished CFs
+CLEAN=pending.0.json.list id.0.map.list cf.0.json.list

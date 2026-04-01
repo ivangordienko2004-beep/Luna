@@ -1,0 +1,5 @@
+RUN=luna -q -g ternary.fa
+RETCODE=0
+STDERR_EMPTY
+STDOUT=output.txt
+CLEAN=id.0.map.list cf.0.json.list

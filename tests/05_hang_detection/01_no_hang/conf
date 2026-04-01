@@ -1,0 +1,4 @@
+RUN=luna -q -g test.fa
+RETCODE=0
+STDOUT_MATCH=0
+CLEAN=id.0.map.list cf.0.json.list

@@ -1,0 +1,8 @@
+import c_print_int(int) as print_int;
+
+sub main()
+{
+	df x;
+
+	print_int(x);
+}

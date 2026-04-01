@@ -1,0 +1,25 @@
+import c_set_value_int(name, int) as set_value_int;
+
+sub set_range(name x, int start, int end)
+{
+	for i = start..end {
+		set_value_int(x[i], i);
+	}
+}
+
+sub sum_range(name a, name b, int start, int end, name result)
+{
+	for i = start..end {
+		set_value_int(result[i], a[i] + b[i]);
+	}
+}
+
+sub main()
+{
+	df x, y, sum;
+
+	set_range(x, 0, 10);
+	set_range(y, 1, 10);
+
+	sum_range(x, y, 0, 11, sum);
+}

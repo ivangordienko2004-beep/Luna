@@ -1,0 +1,18 @@
+#!/usr/bin/luna
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+import c_print(value) as print;
+
+sub main()
+{
+	df x, y;
+
+	cf a: init(7, x) @ {
+		request y;
+		req_count x = (x > y ? 3 : 2);
+	};
+	init(4, y);
+
+	print(x>y? x: y);
+}

@@ -1,0 +1,10 @@
+import c_set_value_int(name, int) as set_value_int;
+import c_print_int(int) as print_int;
+
+sub main()
+{
+	df x;
+
+	set_value_int(x, 0);
+	print_int(x);
+}
