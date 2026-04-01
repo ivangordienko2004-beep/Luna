@@ -1,0 +1,31 @@
+/*
+ Subroutines.
+*/
+
+import c_helloworld() as hello_world;
+
+sub sub4()
+{
+	sub3()@{locator_cyclic:0;};
+}
+
+sub sub3()
+{
+	sub2()@{locator_cyclic:0;};
+}
+
+sub sub2()
+{
+	sub1()@{locator_cyclic:0;};
+}
+
+sub sub1()
+{
+	hello_world()@{locator_cyclic:0;};
+}
+
+sub main()
+{
+	cf a: sub4()@{locator_cyclic:0;};
+}
+

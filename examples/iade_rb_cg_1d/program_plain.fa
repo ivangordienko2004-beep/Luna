@@ -1,0 +1,256 @@
+// IADE method with domain decomposition, Red-Black ordering and CG acceleration
+
+import c_empty(value `df) as empty;
+import c_empty2(value `df1,value `df2) as empty2;
+import c_isready(value `df,name `yes) as isready;
+
+import c_assign_int(int `val,name `df) as assign_int;
+import c_assign_real(real `val,name `df) as assign_real;
+import c_puts(`in string `str) as puts;
+import c_printf_d(`in string `str,int `val1) as printf_d;
+import c_printf_dd(`in string `str,int `val1,int `val2) as printf_dd;
+import c_printf_ddd(`in string `str,int `val1,int `val2,int val3) as printf_ddd;
+import c_printf_dddd(`in string `str,int `val1,int `val2,int `val3,int `val4) as printf_dddd;
+import c_printf_r(`in string `str,real `val1) as printf_r;
+
+//import c_printf_dd_memory_usage(`in string `str,int `val1,int `val2) as printf_dd_memory_usage;
+
+import c_sscanf_d(`in string `str, `out name `val1) as sscanf_d;
+import c_sscanf_dd(`in string `str, `out name `val1, name `val2) as sscanf_dd;
+import c_sscanf_ddd(`in string `str, `out name `val1, name `val2, name `val3) as sscanf_ddd;
+import c_sscanf_dddd(`in string `str, `out name `val1, name `val2, name `val3, name `val4) as sscanf_dddd;
+
+import c_init_fragment_size_start(int `n,int `nf,int `i,name `nfsR,name `nfsB,name `nf0R,name `nf0B) as init_fragment_size_start;
+
+import c_init_parameters(int `n,name `df) as init_parameters;
+import c_print_parameters(value `df_param) as print_parameters;
+import c_get_eps(value `df_param,name `df_eps) as get_eps;
+import c_init_exact(int `nfs,int `nf0,value `df_param,int `it,name `df_exact) as init_exact;
+import c_init_e_l(int `nfsR,int `nfsB,int `nfi,value `param,real `eprev,name `df_eR,name df_eB,name `df_lR,name `df_lB,name df_enext) as init_e_l;
+import c_init_v(int `nfs,int `nf0,value `param,value `df_l,name `df_v) as init_v;
+import c_init_s(int `nfs,int `nf0,value `param,value `df_e,name `df_s) as init_s;
+import c_init_d(int `nfs,int `nf0,value `param,value `df_e,name `df_d) as init_d;
+import c_init_x(int `nfs,int `nf0,value `param,name `df_x) as init_x;
+import c_init_y(int `nfs,int `nf0,value `param,real `value,real `value_left,name `df_y) as init_y;
+import c_init_rhs(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,name `df_fR,name `df_fB) as init_rhs;
+import c_get_init_y(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_sB,name `df_y_value,name `df_y_left) as get_init_y;
+import c_copy(value `df_in,name `df_out) as copy;
+import c_dset(int `n,real `value,name `df_out) as dset;
+import c_iadeR(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_yR,value `df_yB,value `df_fR,value `df_sR,value `df_lB,value `df_dR,value `df_vB,name `df_xR_new,name `df_yR_new) as iadeR;
+import c_iadeB(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_yR,value `df_yB,value `df_fB,value `df_sB,value `df_lR,value `df_dB,value `df_vR,name `df_xB_new,name `df_yB_new) as iadeB;
+
+import c_init_r(int `nfsR,int nfsB,int `nf0R,int `nf0B,value `param,value `df_xR,value `df_xB,value `df_fR,value `df_fB,name `df_rR,name `df_rB) as init_r;
+import c_cgR(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_rR,value `df_zR,value `df_zB,name `df_xR_new,name `df_rR_new,name `df_zR_new) as cgR;
+import c_cgB(int `nfsR,int `nfsB,value `param,value `df_xB,value `df_rB,value `df_zR,value `df_zB,name `df_xB_new,name `df_rB_new,name `df_zB_new) as cgB;
+
+import c_delta_norma_inf(value `df_x1,value `df_x2,name `df_result) as delta_norma_inf;
+import c_dmax3(real `x1,real `x2,real `x3,name `df_max) as dmax3;
+import c_get_B_left_border(int `nfsB,value `df_xB,name `df_xleft) as get_B_left_border;
+import c_get_R_right_border(int `nfsR,value `df_xR,name `df_xright) as get_R_right_border;
+import c_set_B_right_border(int `nfsB,value `df_xB,real `xleft,name `df_xB_new) as set_B_right_border;
+import c_set_R_left_border(int `nfsR,value `df_xR,real `xright,name `df_xR_new) as set_R_left_border;
+import c_save_file_d(value `df,string `name,int it) as save_file_d;
+import c_save_file_seq(int `nfsR,int `nfsB,int `nfi,int `nf,value `df_xR,value `df_xB,string `name,int `it,int `prev,name `next) as save_file_seq;
+
+sub main(string args)
+{
+  df n,nf,nt,ns,nfsR,nfsB,nf0R,nf0B,p,   pR,xRg,yRg,eR,lR,vR,sR,dR,fR,exactR,
+     y0,yl,enext, cnt,count, seqe,seqx,  pB,xBg,yBg,eB,lB,vB,sB,dB,fB,exactB, ready,
+     // count
+     delta,eps,iter,xR,xB,yR,yB,rR,rB,zR,zB,yRt,xRt,xBt,xBtt,xRr,xBr,zRt,zBt,
+     // delta_norma_inf_all
+     dnR,dnB,dnmax,
+     // send_all_R_right_borders
+     xright1,xright2,xright3,xright4,
+     // sub send_all_B_left_borders(`in int nf, name nfsB, name xB_in, `out name xB_out)
+     xleft1,xleft2,xleft3,
+     // save_fragmented_array
+     seqsave1,seqsave2,seqsave3,seqsave4;
+
+  cf i_n: assign_int(`in 10000000, `out n); // Mesh size
+  cf i_nf: assign_int(`in 4, `out nf);      // Number of fragments
+  cf i_nt: assign_int(`in 20, `out nt);     // Number of time steps
+  cf i_ns: assign_int(`in 0, `out ns); // Number of iterations between logs
+
+  //cf init: sscanf_ddd(`in args, `out n,nf,nt); // Obtain command line arguments: n, nf, nt
+  //cf prn: printf_ddd("Mesh/Fragments: %d / %d   Iterations: %d\n",n,nf,nt);
+
+  //cf init: sscanf_dddd(`in args, `out n,nf,nt,ns); // Obtain command line arguments: n, nf, nt, ns
+  cf prn: printf_dddd("Mesh/Fragments: %d / %d   Iterations: %d (%d)\n",n,nf,nt,ns);
+
+  cf ip: init_parameters(`in n, `out p);
+  cf i_enext: assign_real(`in 0.0, `out enext[0]);
+  cf i_count: assign_int(`in 0, `out count[0]);
+
+  for j=0..nf-1
+  { cf i_fs[j]: init_fragment_size_start(`in n,nf,j, `out nfsR[j],nfsB[j],nf0R[j],nf0B[j]) @ { locator_cyclic:j; };
+    cf i_el[j]: init_e_l(`in nfsR[j],nfsB[j],j,p,enext[j], `out eR[j],eB[j],lR[j],lB[j],enext[j+1]) @ { locator_cyclic:j; };
+    cf i_vR[j]: init_v(`in nfsR[j],nf0R[j],p,lR[j], `out vR[j]) @ { locator_cyclic:j; };
+    cf i_vB[j]: init_v(`in nfsB[j],nf0B[j],p,lB[j], `out vB[j]) @ { locator_cyclic:j; };
+    cf i_sR[j]: init_s(`in nfsR[j],nf0R[j],p,eR[j], `out sR[j]) @ { locator_cyclic:j; };
+    cf i_sB[j]: init_s(`in nfsB[j],nf0B[j],p,eB[j], `out sB[j]) @ { locator_cyclic:j; };
+    cf i_dR[j]: init_d(`in nfsR[j],nf0R[j],p,eR[j], `out dR[j]) @ { locator_cyclic:j; };
+    cf i_dB[j]: init_d(`in nfsB[j],nf0B[j],p,eB[j], `out dB[j]) @ { locator_cyclic:j; };
+    cf i_xR[j]: init_x(`in nfsR[j],nf0R[j],p, `out xRg[0][j]) @ { locator_cyclic:j; };
+    cf i_xB[j]: init_x(`in nfsB[j],nf0B[j],p, `out xBg[0][j]) @ { locator_cyclic:j; };
+    cf i_yR[j]: init_y(`in nfsR[j],nf0R[j],p,y0,yl, `out yRg[0][j]) @ { locator_cyclic:j; };
+    cf i_yB[j]: init_y(`in nfsB[j],nf0B[j],p,y0,yl, `out yBg[0][j]) @ { locator_cyclic:j; };
+  }
+  cf get_y: get_init_y(`in nfsR[0],nfsB[0],p,xRg[0][0],xBg[0][0],sB[0], `out y0,yl);
+
+  for it=0..nt-1
+  {
+    cf rdy[it]: isready(`in xRg[it][0], `out ready[it]);
+    //=== Write intermediate results to files ======
+    if (ns!=0) if (it%ns==0) if (ready[it])
+    {
+      cf sqe: assign_int(`in 0, `out seqe[it][0]);
+      cf sqx: assign_int(`in 0, `out seqx[it][0]);
+      for j=0..nf-1 cf i_exR[j]: init_exact(`in nfsR[j],nf0R[j],p,it, `out exactR[it][j]) @ { locator_cyclic:j; };
+      for j=0..nf-1 cf i_exB[j]: init_exact(`in nfsB[j],nf0B[j],p,it, `out exactB[it][j]) @ { locator_cyclic:j; };
+      //cf save_e: save_fragmented_array(`in nf,nfsR,nfsB,exactR[it],exactB[it],"e%05d",it,seqe[it][0], `out seqe[it][1]);
+      //{ df seqsave1;
+        assign_int(`in seqe[it][0], `out seqsave1[it][0]);
+        for j=0..nf-1 cf sav[j]: save_file_seq(`in nfsR[j],nfsB[j],j,nf,exactR[it][j],exactB[it][j],"e%05d",it,seqsave1[it][j], `out seqsave1[it][j+1]) --> (seqsave1[it][j]) @ { locator_cyclic:j; };
+        assign_int(`in seqsave1[it][nf], `out seqe[it][1]) --> (seqsave1[it][nf]);
+      //}
+      //cf save_x: save_fragmented_array(`in nf,nfsR,nfsB,xRg[it],xBg[it],"x%05d",it,seqx[it][0], `out seqx[it][1]);
+      //{ df seqsave2;
+        assign_int(`in seqx[it][0], `out seqsave2[it][0]);
+        for j=0..nf-1 cf sav[j]: save_file_seq(`in nfsR[j],nfsB[j],j,nf,xRg[it][j],xBg[it][j],"x%05d",it,seqsave2[it][j], `out seqsave2[it][j+1]) --> (seqsave2[it][j]) @ { locator_cyclic:j; };
+        assign_int(`in seqsave2[it][nf], `out seqx[it][1]) --> (seqsave2[it][nf]);
+      //}
+    }
+    //==============================================
+
+    for j=0..nf-1 cf i_rhs[j]: init_rhs(`in nfsR[j],nfsB[j],p,xRg[it][j],xBg[it][j], `out fR[it][j],fB[it][j]) @ { locator_cyclic:j; };
+
+    //cf solve: solve(`in  nf,nfsR,nfsB,nf0R,nf0B,p,xRg[it],xBg[it],yRg[it],yBg[it],fR[it],fB[it],eR,eB,lR,lB,vR,vB,sR,sB,dR,dB,it,
+    //                `out xRg[it+1],xBg[it+1],yRg[it+1],yBg[it+1],cnt[it]);
+    //{
+      for j=0..nf-1
+      { cf cpixR[j]: copy(`in xRg[it][j], `out xR[it][0][j]) @ { locator_cyclic:j; };
+        cf cpixB[j]: copy(`in xBg[it][j], `out xB[it][0][j]) @ { locator_cyclic:j; };
+        cf cpiyR[j]: copy(`in yRg[it][j], `out yR[it][0][j]) @ { locator_cyclic:j; };
+        cf cpiyB[j]: copy(`in yBg[it][j], `out yB[it][0][j]) @ { locator_cyclic:j; };
+      }
+      if (ready[it])
+      { cf eps1: get_eps(`in p, `out eps[it]);
+        cf eps2: assign_real(`in eps[it], `out delta[it][0]);
+      }
+      while (delta[it][i] >= eps[it]),i=0..out iter[it]
+      {
+        for j=0..nf-1 cf iadeR[j]: iadeR(`in nfsR[j],nfsB[j],p,xR[it][i][j],xB[it][i][j],yR[it][i][j],yB[it][i][j],fR[it][j],sR[j],lB[j],dR[j],vB[j], `out xRt[it][i][j],yRt[it][i][j]) @ { locator_cyclic:j; };
+
+        //cf yR2r: send_all_R_right_borders(`in nf,nfsR,yRt[it][i], `out yR[it][i+1]);
+        //{ df xright1;
+          for j=0..nf-2 cf get[j]: get_R_right_border(`in nfsR[j],yRt[it][i][j], `out xright1[it][i][j]) @ { locator_cyclic:j; };
+          cf cp[0]: copy(`in yRt[it][i][0], `out yR[it][i+1][0]);
+          for j=1..nf-1 cf set[j]: set_R_left_border(`in nfsR[j],yRt[it][i][j],xright1[it][i][j-1], `out yR[it][i+1][j]) --> (xright1[it][i][j-1]) @ { locator_cyclic:j; };
+        //}
+
+        for j=0..nf-1 cf iadeB[j]: iadeB(`in nfsR[j],nfsB[j],p,xRt[it][i][j],xB[it][i][j],yR[it][i+1][j],yB[it][i][j],fB[it][j],sB[j],lR[j],dB[j],vR[j], `out xBt[it][i][j],yB[it][i+1][j]) @ { locator_cyclic:j; };
+        if (i==0)
+        { //cf xRt2r: send_all_R_right_borders(`in nf,nfsR,xRt[it][0], `out xRr[it]);
+          //{ df xright2;
+            for j=0..nf-2 cf get[j]: get_R_right_border(`in nfsR[j],xRt[it][0][j], `out xright2[it][i][j]) @ { locator_cyclic:j; };
+            cf cp[0]: copy(`in xRt[it][0][0], `out xRr[it][0]);
+            for j=1..nf-1 cf set[j]: set_R_left_border(`in nfsR[j],xRt[it][0][j],xright2[it][i][j-1], `out xRr[it][j]) --> (xright2[it][i][j-1]) @ { locator_cyclic:j; };
+          //}
+          //cf xBt2l: send_all_B_left_borders(`in nf,nfsB,xBt[it][0], `out xBr[it]);
+          //{ df xleft1;
+            for j=1..nf-1 cf get[j]: get_B_left_border(`in nfsB[j],xBt[it][0][j], `out xleft1[it][i][j]) @ { locator_cyclic:j; };
+            cf cp[nf-1]: copy(`in xBt[it][0][nf-1], `out xBr[it][nf-1]) @ { locator_cyclic:nf-1; };
+            for j=0..nf-2 cf set[j]: set_B_right_border(`in nfsB[j],xBt[it][0][j],xleft1[it][i][j+1], `out xBr[it][j]) --> (xleft1[it][i][j+1]) @ { locator_cyclic:j; };
+          //}
+          for j=0..nf-1 cf i_r[j]: init_r(`in nfsR[j],nfsB[j],nf0R[j],nf0B[j],p,xRr[it][j],xBr[it][j],fR[it][j],fB[it][j], `out rR[it][0][j],rB[it][0][j]) --> (xRr[it][j],xBr[it][j]) @ { locator_cyclic:j; };
+          for j=0..nf-1 cf cprzR[j]: copy(`in rR[it][0][j], `out zR[it][0][j]) @ { locator_cyclic:j; };
+          for j=0..nf-1 cf cprzB[j]: copy(`in rB[it][0][j], `out zB[it][0][j]) @ { locator_cyclic:j; };
+        }
+        //cf zB2l: send_all_R_right_borders(`in nf,nfsR,zR[it][i], `out zRt[it][i]);
+        //{ df xright3;
+          for j=0..nf-2 cf get[j]: get_R_right_border(`in nfsR[j],zR[it][i][j], `out xright3[it][i][j]) @ { locator_cyclic:j; };
+          cf cp[0]: copy(`in zR[it][i][0], `out zRt[it][i][0]);
+          for j=1..nf-1 cf set[j]: set_R_left_border(`in nfsR[j],zR[it][i][j],xright3[it][i][j-1], `out zRt[it][i][j]) --> (xright3[it][i][j-1]) @ { locator_cyclic:j; };
+        //}
+        //cf zR2r: send_all_B_left_borders(`in nf,nfsB,zB[it][i], `out zBt[it][i]);
+        //{ df xleft2;
+          for j=1..nf-1 cf get[j]: get_B_left_border(`in nfsB[j],zB[it][i][j], `out xleft2[it][i][j]) @ { locator_cyclic:j; };
+          cf cp[nf-1]: copy(`in zB[it][i][nf-1], `out zBt[it][i][nf-1]) @ { locator_cyclic:nf-1; };
+          for j=0..nf-2 cf set[j]: set_B_right_border(`in nfsB[j],zB[it][i][j],xleft2[it][i][j+1], `out zBt[it][i][j]) --> (xleft2[it][i][j+1]) @ { locator_cyclic:j; };
+        //}
+
+        for j=0..nf-1 cf cgr[j]: cgR(`in nfsR[j],nfsB[j],p,xRt[it][i][j],rR[it][i][j],zRt[it][i][j],zBt[it][i][j], `out xR[it][i+1][j],rR[it][i+1][j],zR[it][i+1][j]) @ { locator_cyclic:j; };
+        for j=0..nf-1 cf cgb[j]: cgB(`in nfsR[j],nfsB[j],p,xBt[it][i][j],rB[it][i][j],zRt[it][i][j],zBt[it][i][j], `out xBtt[it][i][j],rB[it][i+1][j],zB[it][i+1][j]) @ { locator_cyclic:j; };
+
+        //cf xBtt2l: send_all_B_left_borders(`in nf,nfsB,xBtt[it][i], `out xB[it][i+1]);
+        //{ df xleft3;
+          for j=1..nf-1 cf get[j]: get_B_left_border(`in nfsB[j],xBtt[it][i][j], `out xleft3[it][i][j]) @ { locator_cyclic:j; };
+          cf cp[nf-1]: copy(`in xBtt[it][i][nf-1], `out xB[it][i+1][nf-1]) @ { locator_cyclic:nf-1; };
+          for j=0..nf-2 cf set[j]: set_B_right_border(`in nfsB[j],xBtt[it][i][j],xleft3[it][i][j+1], `out xB[it][i+1][j]) --> (xleft3[it][i][j+1]) @ { locator_cyclic:j; };
+        //}
+
+        //cf nrm: delta_norma_inf_all(`in nf,xR[it][i],xB[it][i],xR[it][i+1],xB[it][i+1], `out delta[it][i+1]) --> (delta[it][i]);
+        //{
+          for j=0..nf-1 cf dniR[j]: delta_norma_inf(xR[it][i][j],xR[it][i+1][j], `out dnR[it][i][j]) @ { locator_cyclic:j; };
+          for j=0..nf-1 cf dniB[j]: delta_norma_inf(xB[it][i][j],xB[it][i+1][j], `out dnB[it][i][j]) @ { locator_cyclic:j; };
+          cf dm0: assign_real(`in 0.0, `out dnmax[it][i][0]);
+          for j=0..nf-1 cf dm[j]: dmax3(`in dnR[it][i][j],dnB[it][i][j],dnmax[it][i][j], `out dnmax[it][i][j+1]) --> (dnmax[it][i][j],dnR[it][i][j],dnB[it][i][j]) @ { locator_cyclic:j; };
+          cf cp[0]: assign_real(`in dnmax[it][i][nf], `out delta[it][i+1]) --> (dnmax[it][i][nf]);
+        //}
+        // delete : delta[it][i]
+
+        for j=0..nf-1
+          cf free[j]: empty(`in delta[it][i+1]) --> (xRt[it][i][j],xBt[it][i][j],yRt[it][i][j],zRt[it][i][j],zBt[it][i][j],xBtt[it][i][j],
+                                                     xR[it][i][j],xB[it][i][j],yR[it][i][j],yB[it][i][j],zR[it][i][j],zB[it][i][j],rR[it][i][j],rB[it][i][j]) @ { locator_cyclic:j; };
+      }
+
+      //cf prn: printf_dd_memory_usage("%6d: %3d\n",it,iter[it]) --> (ready[it],eps[it]); // Print memory usage
+      cf prn: printf_dd("%6d: %3d\n",it,iter[it]) --> (ready[it]); // Do not print memory usage !!!error???
+
+      //cf cpoxR: send_all_R_right_borders(`in nf, nfsR, xR[it][iter[it]], `out xRg[it+1]);
+      //{ df xright4;
+        for j=0..nf-2 cf get[j]: get_R_right_border(`in nfsR[j],xR[it][iter[it]][j], `out xright4[it][j]) @ { locator_cyclic:j; };
+        cf cp[0]: copy(`in xR[it][iter[it]][0], `out xRg[it+1][0]);
+        for j=1..nf-1 cf set[j]: set_R_left_border(`in nfsR[j],xR[it][iter[it]][j],xright4[it][j-1], `out xRg[it+1][j]) --> (xright4[it][j-1]) @ { locator_cyclic:j; };
+      //}
+
+      for j=0..nf-2 cf free[j]: empty2(`in xRg[it+1][j],xRg[it+1][j+1]) --> (xR[it][iter[it]][j]) @ { locator_cyclic:j; };
+      cf free[nf-1]: empty(`in xRg[it+1][nf-1]) --> (xR[it][iter[it]][nf-1]) @ { locator_cyclic:nf-1; };
+      for j=0..nf-1 cf cpoxB[j]: copy(`in xB[it][iter[it]][j], `out xBg[it+1][j]) --> (xB[it][iter[it]][j]) @ { locator_cyclic:j; };
+      for j=0..nf-1 cf cpoyR[j]: copy(`in yR[it][iter[it]][j], `out yRg[it+1][j]) --> (yR[it][iter[it]][j],zR[it][iter[it]][j],rR[it][iter[it]][j]) @ { locator_cyclic:j; };
+      for j=0..nf-1 cf cpoyB[j]: copy(`in yB[it][iter[it]][j], `out yBg[it+1][j]) --> (yB[it][iter[it]][j],zB[it][iter[it]][j],rB[it][iter[it]][j]) @ { locator_cyclic:j; };
+      cf cnt: assign_int(`in iter[it], `out cnt[it]);
+
+      // delete : delta[it][iter[it]],eps[it],ready[it]
+      // delete : iter[it]
+    //}
+
+    cf cnt: assign_int(`in count[it]+cnt[it], `out count[it+1]) --> (count[it],cnt[it]);
+    for j=0..nf-1 cf free[j]: empty(`in xRg[it+1][j]) --> (xRg[it][j],xBg[it][j],yRg[it][j],yBg[it][j],fR[it][j],fB[it][j]) @ { locator_cyclic:j; };
+  }
+
+  //=== Write final results to files =============
+  if (ns!=0) if (ready[nt-1])
+  {
+    cf sqe: assign_int(`in 0, `out seqe[nt][0]);
+    cf sqx: assign_int(`in 0, `out seqx[nt][0]);
+    for j=0..nf-1 cf i_exR[j]: init_exact(`in nfsR[j],nf0R[j],p,nt, `out exactR[nt][j]) @ { locator_cyclic:j; };
+    for j=0..nf-1 cf i_exB[j]: init_exact(`in nfsB[j],nf0B[j],p,nt, `out exactB[nt][j]) @ { locator_cyclic:j; };
+    //cf save_e: save_fragmented_array(`in nf,nfsR,nfsB,exactR[nt],exactB[nt],"e%05d",nt,seqe[nt][0], `out seqe[nt][1]);
+    //{ df seqsave3;
+      assign_int(`in seqe[nt][0], `out seqsave3[0]);
+      for j=0..nf-1 cf sav[j]: save_file_seq(`in nfsR[j],nfsB[j],j,nf,exactR[nt][j],exactB[nt][j],"e%05d",nt,seqsave3[j], `out seqsave3[j+1]) --> (seqsave3[j]) @ { locator_cyclic:j; };
+      assign_int(`in seqsave3[nf], `out seqe[nt][1]) --> (seqsave3[nf]);
+    //}
+    //cf save_x: save_fragmented_array(`in nf,nfsR,nfsB,xRg[nt],xBg[nt],"x%05d",nt,seqx[nt][0], `out seqx[nt][1]);
+    //{ df seqsave4;
+      assign_int(`in seqx[nt][0], `out seqsave4[0]);
+      for j=0..nf-1 cf sav[j]: save_file_seq(`in nfsR[j],nfsB[j],j,nf,xRg[nt][j],xBg[nt][j],"x%05d",nt,seqsave4[j], `out seqsave4[j+1]) --> (seqsave4[j]) @ { locator_cyclic:j; };
+      assign_int(`in seqsave4[nf], `out seqx[nt][1]) --> (seqsave4[nf]);
+    //}
+  }
+  //==============================================
+
+  cf prn_cnt: printf_d("Count: %d\n",count[nt]);
+}

@@ -1,0 +1,68 @@
+#!/usr/bin/luna
+/*
+ For and while operators ("loops").
+*/
+
+import c_init(int, name) as init;
+import c_show(string, int) as show;
+/*
+sub main2() {
+	df N;
+	while i<=5, i=1..out N {
+		show("i=", i) @ { locator_cyclic: 0; };
+	} @ {
+		locator_cyclic: i;
+		req_count N=1;
+	}
+	show("N=", N) @ {
+		locator_cyclic: 0;
+		request N;
+	};
+} @ {
+	locator_cyclic N=>0;
+}
+*/
+sub main() {
+	for i=1..100 {
+		show("i=", i) @ { locator_cyclic: i; };
+	} @ {locator_cyclic: 0;}
+}
+/*
+sub main() {
+	df N;
+
+	cf show: show("N is", N) @ {
+		wait N;
+	};
+
+	for i = 1..N
+	{
+		show("Bottle(s) of beer:", 10 - i) @ {
+			locator_cyclic: i;
+		};
+	} @ {
+		request N;
+		unroll_at_once;
+		locator_cyclic: 0;
+	}
+
+	while j < 15, j = 1..out N 
+	{
+		if (j % 3) == 0 {
+			show("div by 3:", j) @ {locator_cyclic: j; };
+		} @ {
+			locator_cyclic: 0;
+		}
+//		else 
+//			show("no div by 3:", j);
+	} @ {
+		afterpush N => show;
+		req_count N=1;
+		unroll_at_once;
+		locator_cyclic: j;
+	}
+} @ {
+	locator_cyclic show=>0;
+	locator_cyclic N=>1;
+}
+*/

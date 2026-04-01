@@ -1,0 +1,2094 @@
+
+//------------------------------------------
+// Mesh3D_exchange LuNA subroutines library
+// Version 0.01
+// Depends: Basic
+//------------------------------------------
+
+#define D000  0
+#define D001  1
+#define D002  2
+#define D010  3
+#define D011  4
+#define D012  5
+#define D020  6
+#define D021  7
+#define D022  8
+#define D100  9
+#define D101  10
+#define D102  11
+#define D110  12
+#define D111  13
+#define D112  14
+#define D120  15
+#define D121  16
+#define D122  17
+#define D200  18
+#define D201  19
+#define D202  20
+#define D210  21
+#define D211  22
+#define D212  23
+#define D220  24
+#define D221  25
+#define D222  26
+
+import c_mesh3d_exchange_6_copy_00_00_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfv) as mesh3d_exchange_6_copy_00_00_00;
+import c_mesh3d_exchange_6_get_00_00_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb112) as mesh3d_exchange_6_get_00_00_01;
+import c_mesh3d_exchange_6_set_00_00_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_00_00_01;
+import c_mesh3d_exchange_6_get_00_00_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110) as mesh3d_exchange_6_get_00_00_10;
+import c_mesh3d_exchange_6_set_00_00_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110, `out name `dfv) as mesh3d_exchange_6_set_00_00_10;
+import c_mesh3d_exchange_6_get_00_00_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb112) as mesh3d_exchange_6_get_00_00_11;
+import c_mesh3d_exchange_6_set_00_00_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_00_00_11;
+import c_mesh3d_exchange_6_get_00_01_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb121) as mesh3d_exchange_6_get_00_01_00;
+import c_mesh3d_exchange_6_set_00_01_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_01_00;
+import c_mesh3d_exchange_6_get_00_01_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb112,name `dfb121) as mesh3d_exchange_6_get_00_01_01;
+import c_mesh3d_exchange_6_set_00_01_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_01_01;
+import c_mesh3d_exchange_6_get_00_01_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb121) as mesh3d_exchange_6_get_00_01_10;
+import c_mesh3d_exchange_6_set_00_01_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_01_10;
+import c_mesh3d_exchange_6_get_00_01_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_00_01_11;
+import c_mesh3d_exchange_6_set_00_01_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_01_11;
+import c_mesh3d_exchange_6_get_00_10_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101) as mesh3d_exchange_6_get_00_10_00;
+import c_mesh3d_exchange_6_set_00_10_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101, `out name `dfv) as mesh3d_exchange_6_set_00_10_00;
+import c_mesh3d_exchange_6_get_00_10_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb112) as mesh3d_exchange_6_get_00_10_01;
+import c_mesh3d_exchange_6_set_00_10_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_00_10_01;
+import c_mesh3d_exchange_6_get_00_10_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110) as mesh3d_exchange_6_get_00_10_10;
+import c_mesh3d_exchange_6_set_00_10_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110, `out name `dfv) as mesh3d_exchange_6_set_00_10_10;
+import c_mesh3d_exchange_6_get_00_10_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb112) as mesh3d_exchange_6_get_00_10_11;
+import c_mesh3d_exchange_6_set_00_10_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_00_10_11;
+import c_mesh3d_exchange_6_get_00_11_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb121) as mesh3d_exchange_6_get_00_11_00;
+import c_mesh3d_exchange_6_set_00_11_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_11_00;
+import c_mesh3d_exchange_6_get_00_11_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_00_11_01;
+import c_mesh3d_exchange_6_set_00_11_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_11_01;
+import c_mesh3d_exchange_6_get_00_11_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb121) as mesh3d_exchange_6_get_00_11_10;
+import c_mesh3d_exchange_6_set_00_11_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_11_10;
+import c_mesh3d_exchange_6_get_00_11_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_00_11_11;
+import c_mesh3d_exchange_6_set_00_11_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_00_11_11;
+import c_mesh3d_exchange_6_get_01_00_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb211) as mesh3d_exchange_6_get_01_00_00;
+import c_mesh3d_exchange_6_set_01_00_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_00_00;
+import c_mesh3d_exchange_6_get_01_00_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb112,name `dfb211) as mesh3d_exchange_6_get_01_00_01;
+import c_mesh3d_exchange_6_set_01_00_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_00_01;
+import c_mesh3d_exchange_6_get_01_00_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb211) as mesh3d_exchange_6_get_01_00_10;
+import c_mesh3d_exchange_6_set_01_00_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_00_10;
+import c_mesh3d_exchange_6_get_01_00_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_01_00_11;
+import c_mesh3d_exchange_6_set_01_00_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_00_11;
+import c_mesh3d_exchange_6_get_01_01_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_01_00;
+import c_mesh3d_exchange_6_set_01_01_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_01_00;
+import c_mesh3d_exchange_6_get_01_01_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_01_01;
+import c_mesh3d_exchange_6_set_01_01_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_01_01;
+import c_mesh3d_exchange_6_get_01_01_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_01_10;
+import c_mesh3d_exchange_6_set_01_01_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_01_10;
+import c_mesh3d_exchange_6_get_01_01_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb110,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_01_11;
+import c_mesh3d_exchange_6_set_01_01_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb110,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_01_11;
+import c_mesh3d_exchange_6_get_01_10_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb211) as mesh3d_exchange_6_get_01_10_00;
+import c_mesh3d_exchange_6_set_01_10_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_10_00;
+import c_mesh3d_exchange_6_get_01_10_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_01_10_01;
+import c_mesh3d_exchange_6_set_01_10_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_10_01;
+import c_mesh3d_exchange_6_get_01_10_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb211) as mesh3d_exchange_6_get_01_10_10;
+import c_mesh3d_exchange_6_set_01_10_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_10_10;
+import c_mesh3d_exchange_6_get_01_10_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_01_10_11;
+import c_mesh3d_exchange_6_set_01_10_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_10_11;
+import c_mesh3d_exchange_6_get_01_11_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_11_00;
+import c_mesh3d_exchange_6_set_01_11_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_11_00;
+import c_mesh3d_exchange_6_get_01_11_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_11_01;
+import c_mesh3d_exchange_6_set_01_11_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_11_01;
+import c_mesh3d_exchange_6_get_01_11_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_11_10;
+import c_mesh3d_exchange_6_set_01_11_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_11_10;
+import c_mesh3d_exchange_6_get_01_11_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb101,name `dfb110,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_01_11_11;
+import c_mesh3d_exchange_6_set_01_11_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb101,value `dfb110,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_01_11_11;
+import c_mesh3d_exchange_6_get_10_00_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011) as mesh3d_exchange_6_get_10_00_00;
+import c_mesh3d_exchange_6_set_10_00_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011, `out name `dfv) as mesh3d_exchange_6_set_10_00_00;
+import c_mesh3d_exchange_6_get_10_00_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb112) as mesh3d_exchange_6_get_10_00_01;
+import c_mesh3d_exchange_6_set_10_00_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_10_00_01;
+import c_mesh3d_exchange_6_get_10_00_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110) as mesh3d_exchange_6_get_10_00_10;
+import c_mesh3d_exchange_6_set_10_00_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110, `out name `dfv) as mesh3d_exchange_6_set_10_00_10;
+import c_mesh3d_exchange_6_get_10_00_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb112) as mesh3d_exchange_6_get_10_00_11;
+import c_mesh3d_exchange_6_set_10_00_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_10_00_11;
+import c_mesh3d_exchange_6_get_10_01_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb121) as mesh3d_exchange_6_get_10_01_00;
+import c_mesh3d_exchange_6_set_10_01_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_01_00;
+import c_mesh3d_exchange_6_get_10_01_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_10_01_01;
+import c_mesh3d_exchange_6_set_10_01_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_01_01;
+import c_mesh3d_exchange_6_get_10_01_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb121) as mesh3d_exchange_6_get_10_01_10;
+import c_mesh3d_exchange_6_set_10_01_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_01_10;
+import c_mesh3d_exchange_6_get_10_01_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_10_01_11;
+import c_mesh3d_exchange_6_set_10_01_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_01_11;
+import c_mesh3d_exchange_6_get_10_10_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101) as mesh3d_exchange_6_get_10_10_00;
+import c_mesh3d_exchange_6_set_10_10_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101, `out name `dfv) as mesh3d_exchange_6_set_10_10_00;
+import c_mesh3d_exchange_6_get_10_10_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb112) as mesh3d_exchange_6_get_10_10_01;
+import c_mesh3d_exchange_6_set_10_10_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_10_10_01;
+import c_mesh3d_exchange_6_get_10_10_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110) as mesh3d_exchange_6_get_10_10_10;
+import c_mesh3d_exchange_6_set_10_10_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110, `out name `dfv) as mesh3d_exchange_6_set_10_10_10;
+import c_mesh3d_exchange_6_get_10_10_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb112) as mesh3d_exchange_6_get_10_10_11;
+import c_mesh3d_exchange_6_set_10_10_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb112, `out name `dfv) as mesh3d_exchange_6_set_10_10_11;
+import c_mesh3d_exchange_6_get_10_11_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb121) as mesh3d_exchange_6_get_10_11_00;
+import c_mesh3d_exchange_6_set_10_11_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_11_00;
+import c_mesh3d_exchange_6_get_10_11_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_10_11_01;
+import c_mesh3d_exchange_6_set_10_11_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_11_01;
+import c_mesh3d_exchange_6_get_10_11_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb121) as mesh3d_exchange_6_get_10_11_10;
+import c_mesh3d_exchange_6_set_10_11_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_11_10;
+import c_mesh3d_exchange_6_get_10_11_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb112,name `dfb121) as mesh3d_exchange_6_get_10_11_11;
+import c_mesh3d_exchange_6_set_10_11_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb112,value `dfb121, `out name `dfv) as mesh3d_exchange_6_set_10_11_11;
+import c_mesh3d_exchange_6_get_11_00_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb211) as mesh3d_exchange_6_get_11_00_00;
+import c_mesh3d_exchange_6_set_11_00_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_00_00;
+import c_mesh3d_exchange_6_get_11_00_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_11_00_01;
+import c_mesh3d_exchange_6_set_11_00_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_00_01;
+import c_mesh3d_exchange_6_get_11_00_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb211) as mesh3d_exchange_6_get_11_00_10;
+import c_mesh3d_exchange_6_set_11_00_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_00_10;
+import c_mesh3d_exchange_6_get_11_00_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_11_00_11;
+import c_mesh3d_exchange_6_set_11_00_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_00_11;
+import c_mesh3d_exchange_6_get_11_01_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_01_00;
+import c_mesh3d_exchange_6_set_11_01_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_01_00;
+import c_mesh3d_exchange_6_get_11_01_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_01_01;
+import c_mesh3d_exchange_6_set_11_01_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_01_01;
+import c_mesh3d_exchange_6_get_11_01_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_01_10;
+import c_mesh3d_exchange_6_set_11_01_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_01_10;
+import c_mesh3d_exchange_6_get_11_01_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb110,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_01_11;
+import c_mesh3d_exchange_6_set_11_01_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb110,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_01_11;
+import c_mesh3d_exchange_6_get_11_10_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb211) as mesh3d_exchange_6_get_11_10_00;
+import c_mesh3d_exchange_6_set_11_10_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_10_00;
+import c_mesh3d_exchange_6_get_11_10_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_11_10_01;
+import c_mesh3d_exchange_6_set_11_10_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_10_01;
+import c_mesh3d_exchange_6_get_11_10_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb211) as mesh3d_exchange_6_get_11_10_10;
+import c_mesh3d_exchange_6_set_11_10_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_10_10;
+import c_mesh3d_exchange_6_get_11_10_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb112,name `dfb211) as mesh3d_exchange_6_get_11_10_11;
+import c_mesh3d_exchange_6_set_11_10_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb112,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_10_11;
+import c_mesh3d_exchange_6_get_11_11_00(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_11_00;
+import c_mesh3d_exchange_6_set_11_11_00(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_11_00;
+import c_mesh3d_exchange_6_get_11_11_01(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_11_01;
+import c_mesh3d_exchange_6_set_11_11_01(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_11_01;
+import c_mesh3d_exchange_6_get_11_11_10(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_11_10;
+import c_mesh3d_exchange_6_set_11_11_10(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_11_10;
+import c_mesh3d_exchange_6_get_11_11_11(`in int `n0,int `n1,int `n2,value `dfu, `out name `dfb011,name `dfb101,name `dfb110,name `dfb112,name `dfb121,name `dfb211) as mesh3d_exchange_6_get_11_11_11;
+import c_mesh3d_exchange_6_set_11_11_11(`in int `n0,int `n1,int `n2,value `dfu,value `dfb011,value `dfb101,value `dfb110,value `dfb112,value `dfb121,value `dfb211, `out name `dfv) as mesh3d_exchange_6_set_11_11_11;
+
+sub mesh3d_exchange111_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf cpy000000[i][k][l]: mesh3d_exchange_6_copy_00_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l], `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange112_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000001[i][k][l]: mesh3d_exchange_6_get_00_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l]);
+    cf set000001[i][k][l]: mesh3d_exchange_6_set_00_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000010[i][k][l]: mesh3d_exchange_6_get_00_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l]);
+    cf set000010[i][k][l]: mesh3d_exchange_6_set_00_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange113_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get000011[i][k][l]: mesh3d_exchange_6_get_00_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set000011[i][k][l]: mesh3d_exchange_6_set_00_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000001[i][k][l]: mesh3d_exchange_6_get_00_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l]);
+    cf set000001[i][k][l]: mesh3d_exchange_6_set_00_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000010[i][k][l]: mesh3d_exchange_6_get_00_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l]);
+    cf set000010[i][k][l]: mesh3d_exchange_6_set_00_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange121_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001000[i][k][l]: mesh3d_exchange_6_get_00_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l]);
+    cf set001000[i][k][l]: mesh3d_exchange_6_set_00_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000100[i][k][l]: mesh3d_exchange_6_get_00_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l]);
+    cf set000100[i][k][l]: mesh3d_exchange_6_set_00_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange122_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001010[i][k][l]: mesh3d_exchange_6_get_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set001010[i][k][l]: mesh3d_exchange_6_set_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001001[i][k][l]: mesh3d_exchange_6_get_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set001001[i][k][l]: mesh3d_exchange_6_set_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000110[i][k][l]: mesh3d_exchange_6_get_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set000110[i][k][l]: mesh3d_exchange_6_set_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000101[i][k][l]: mesh3d_exchange_6_get_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000101[i][k][l]: mesh3d_exchange_6_set_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange123_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001010[i][k][l]: mesh3d_exchange_6_get_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set001010[i][k][l]: mesh3d_exchange_6_set_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001001[i][k][l]: mesh3d_exchange_6_get_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set001001[i][k][l]: mesh3d_exchange_6_set_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get001011[i][k][l]: mesh3d_exchange_6_get_00_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set001011[i][k][l]: mesh3d_exchange_6_set_00_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000110[i][k][l]: mesh3d_exchange_6_get_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set000110[i][k][l]: mesh3d_exchange_6_set_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000101[i][k][l]: mesh3d_exchange_6_get_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000101[i][k][l]: mesh3d_exchange_6_set_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get000111[i][k][l]: mesh3d_exchange_6_get_00_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000111[i][k][l]: mesh3d_exchange_6_set_00_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange131_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get001100[i][k][l]: mesh3d_exchange_6_get_00_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D121][i][k][l]);
+    cf set001100[i][k][l]: mesh3d_exchange_6_set_00_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001000[i][k][l]: mesh3d_exchange_6_get_00_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l]);
+    cf set001000[i][k][l]: mesh3d_exchange_6_set_00_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000100[i][k][l]: mesh3d_exchange_6_get_00_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l]);
+    cf set000100[i][k][l]: mesh3d_exchange_6_set_00_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange132_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001010[i][k][l]: mesh3d_exchange_6_get_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set001010[i][k][l]: mesh3d_exchange_6_set_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001001[i][k][l]: mesh3d_exchange_6_get_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set001001[i][k][l]: mesh3d_exchange_6_set_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get001101[i][k][l]: mesh3d_exchange_6_get_00_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set001101[i][k][l]: mesh3d_exchange_6_set_00_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000110[i][k][l]: mesh3d_exchange_6_get_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set000110[i][k][l]: mesh3d_exchange_6_set_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001110[i][k][l]: mesh3d_exchange_6_get_00_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set001110[i][k][l]: mesh3d_exchange_6_set_00_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000101[i][k][l]: mesh3d_exchange_6_get_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000101[i][k][l]: mesh3d_exchange_6_set_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange133_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001010[i][k][l]: mesh3d_exchange_6_get_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set001010[i][k][l]: mesh3d_exchange_6_set_00_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get001001[i][k][l]: mesh3d_exchange_6_get_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set001001[i][k][l]: mesh3d_exchange_6_set_00_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get001011[i][k][l]: mesh3d_exchange_6_get_00_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set001011[i][k][l]: mesh3d_exchange_6_set_00_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get001111[i][k][l]: mesh3d_exchange_6_get_00_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set001111[i][k][l]: mesh3d_exchange_6_set_00_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get001101[i][k][l]: mesh3d_exchange_6_get_00_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set001101[i][k][l]: mesh3d_exchange_6_set_00_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get000110[i][k][l]: mesh3d_exchange_6_get_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set000110[i][k][l]: mesh3d_exchange_6_set_00_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get001110[i][k][l]: mesh3d_exchange_6_get_00_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set001110[i][k][l]: mesh3d_exchange_6_set_00_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get000101[i][k][l]: mesh3d_exchange_6_get_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000101[i][k][l]: mesh3d_exchange_6_set_00_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get000111[i][k][l]: mesh3d_exchange_6_get_00_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set000111[i][k][l]: mesh3d_exchange_6_set_00_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange211_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100000[i][k][l]: mesh3d_exchange_6_get_10_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l]);
+    cf set100000[i][k][l]: mesh3d_exchange_6_set_10_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010000[i][k][l]: mesh3d_exchange_6_get_01_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D211][i][k][l]);
+    cf set010000[i][k][l]: mesh3d_exchange_6_set_01_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange212_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010010[i][k][l]: mesh3d_exchange_6_get_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set010010[i][k][l]: mesh3d_exchange_6_set_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010001[i][k][l]: mesh3d_exchange_6_get_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010001[i][k][l]: mesh3d_exchange_6_set_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100010[i][k][l]: mesh3d_exchange_6_get_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l]);
+    cf set100010[i][k][l]: mesh3d_exchange_6_set_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100001[i][k][l]: mesh3d_exchange_6_get_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l]);
+    cf set100001[i][k][l]: mesh3d_exchange_6_set_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange213_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010010[i][k][l]: mesh3d_exchange_6_get_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set010010[i][k][l]: mesh3d_exchange_6_set_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010001[i][k][l]: mesh3d_exchange_6_get_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010001[i][k][l]: mesh3d_exchange_6_set_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010011[i][k][l]: mesh3d_exchange_6_get_01_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010011[i][k][l]: mesh3d_exchange_6_set_01_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100010[i][k][l]: mesh3d_exchange_6_get_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l]);
+    cf set100010[i][k][l]: mesh3d_exchange_6_set_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100001[i][k][l]: mesh3d_exchange_6_get_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l]);
+    cf set100001[i][k][l]: mesh3d_exchange_6_set_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100011[i][k][l]: mesh3d_exchange_6_get_10_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set100011[i][k][l]: mesh3d_exchange_6_set_10_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange221_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011000[i][k][l]: mesh3d_exchange_6_get_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set011000[i][k][l]: mesh3d_exchange_6_set_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100100[i][k][l]: mesh3d_exchange_6_get_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l]);
+    cf set100100[i][k][l]: mesh3d_exchange_6_set_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101000[i][k][l]: mesh3d_exchange_6_get_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l]);
+    cf set101000[i][k][l]: mesh3d_exchange_6_set_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010100[i][k][l]: mesh3d_exchange_6_get_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010100[i][k][l]: mesh3d_exchange_6_set_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange222_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange223_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100111[i][k][l]: mesh3d_exchange_6_get_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100111[i][k][l]: mesh3d_exchange_6_set_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get011011[i][k][l]: mesh3d_exchange_6_get_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011011[i][k][l]: mesh3d_exchange_6_set_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get101011[i][k][l]: mesh3d_exchange_6_get_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set101011[i][k][l]: mesh3d_exchange_6_set_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010111[i][k][l]: mesh3d_exchange_6_get_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010111[i][k][l]: mesh3d_exchange_6_set_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange231_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011000[i][k][l]: mesh3d_exchange_6_get_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set011000[i][k][l]: mesh3d_exchange_6_set_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100100[i][k][l]: mesh3d_exchange_6_get_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l]);
+    cf set100100[i][k][l]: mesh3d_exchange_6_set_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011100[i][k][l]: mesh3d_exchange_6_get_01_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011100[i][k][l]: mesh3d_exchange_6_set_01_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101000[i][k][l]: mesh3d_exchange_6_get_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l]);
+    cf set101000[i][k][l]: mesh3d_exchange_6_set_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101100[i][k][l]: mesh3d_exchange_6_get_10_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D121][i][k][l]);
+    cf set101100[i][k][l]: mesh3d_exchange_6_set_10_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010100[i][k][l]: mesh3d_exchange_6_get_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010100[i][k][l]: mesh3d_exchange_6_set_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange232_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011101[i][k][l]: mesh3d_exchange_6_get_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011101[i][k][l]: mesh3d_exchange_6_set_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101101[i][k][l]: mesh3d_exchange_6_get_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101101[i][k][l]: mesh3d_exchange_6_set_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011110[i][k][l]: mesh3d_exchange_6_get_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011110[i][k][l]: mesh3d_exchange_6_set_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101110[i][k][l]: mesh3d_exchange_6_get_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set101110[i][k][l]: mesh3d_exchange_6_set_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange233_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100111[i][k][l]: mesh3d_exchange_6_get_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100111[i][k][l]: mesh3d_exchange_6_set_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011101[i][k][l]: mesh3d_exchange_6_get_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011101[i][k][l]: mesh3d_exchange_6_set_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get011111[i][k][l]: mesh3d_exchange_6_get_01_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011111[i][k][l]: mesh3d_exchange_6_set_01_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get011011[i][k][l]: mesh3d_exchange_6_get_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011011[i][k][l]: mesh3d_exchange_6_set_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101101[i][k][l]: mesh3d_exchange_6_get_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101101[i][k][l]: mesh3d_exchange_6_set_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get101111[i][k][l]: mesh3d_exchange_6_get_10_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101111[i][k][l]: mesh3d_exchange_6_set_10_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get101011[i][k][l]: mesh3d_exchange_6_get_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set101011[i][k][l]: mesh3d_exchange_6_set_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010111[i][k][l]: mesh3d_exchange_6_get_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010111[i][k][l]: mesh3d_exchange_6_set_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011110[i][k][l]: mesh3d_exchange_6_get_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011110[i][k][l]: mesh3d_exchange_6_set_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101110[i][k][l]: mesh3d_exchange_6_get_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set101110[i][k][l]: mesh3d_exchange_6_set_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange311_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100000[i][k][l]: mesh3d_exchange_6_get_10_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l]);
+    cf set100000[i][k][l]: mesh3d_exchange_6_set_10_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110000[i][k][l]: mesh3d_exchange_6_get_11_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D211][i][k][l]);
+    cf set110000[i][k][l]: mesh3d_exchange_6_set_11_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010000[i][k][l]: mesh3d_exchange_6_get_01_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D211][i][k][l]);
+    cf set010000[i][k][l]: mesh3d_exchange_6_set_01_00_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange312_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110010[i][k][l]: mesh3d_exchange_6_get_11_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set110010[i][k][l]: mesh3d_exchange_6_set_11_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010010[i][k][l]: mesh3d_exchange_6_get_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set010010[i][k][l]: mesh3d_exchange_6_set_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010001[i][k][l]: mesh3d_exchange_6_get_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010001[i][k][l]: mesh3d_exchange_6_set_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100010[i][k][l]: mesh3d_exchange_6_get_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l]);
+    cf set100010[i][k][l]: mesh3d_exchange_6_set_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100001[i][k][l]: mesh3d_exchange_6_get_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l]);
+    cf set100001[i][k][l]: mesh3d_exchange_6_set_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110001[i][k][l]: mesh3d_exchange_6_get_11_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set110001[i][k][l]: mesh3d_exchange_6_set_11_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange313_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110010[i][k][l]: mesh3d_exchange_6_get_11_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set110010[i][k][l]: mesh3d_exchange_6_set_11_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010010[i][k][l]: mesh3d_exchange_6_get_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set010010[i][k][l]: mesh3d_exchange_6_set_01_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010001[i][k][l]: mesh3d_exchange_6_get_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010001[i][k][l]: mesh3d_exchange_6_set_01_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010011[i][k][l]: mesh3d_exchange_6_get_01_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set010011[i][k][l]: mesh3d_exchange_6_set_01_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100010[i][k][l]: mesh3d_exchange_6_get_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l]);
+    cf set100010[i][k][l]: mesh3d_exchange_6_set_10_00_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get110011[i][k][l]: mesh3d_exchange_6_get_11_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set110011[i][k][l]: mesh3d_exchange_6_set_11_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100001[i][k][l]: mesh3d_exchange_6_get_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l]);
+    cf set100001[i][k][l]: mesh3d_exchange_6_set_10_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110001[i][k][l]: mesh3d_exchange_6_get_11_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set110001[i][k][l]: mesh3d_exchange_6_set_11_00_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100011[i][k][l]: mesh3d_exchange_6_get_10_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set100011[i][k][l]: mesh3d_exchange_6_set_10_00_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange321_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011000[i][k][l]: mesh3d_exchange_6_get_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set011000[i][k][l]: mesh3d_exchange_6_set_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100100[i][k][l]: mesh3d_exchange_6_get_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l]);
+    cf set100100[i][k][l]: mesh3d_exchange_6_set_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101000[i][k][l]: mesh3d_exchange_6_get_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l]);
+    cf set101000[i][k][l]: mesh3d_exchange_6_set_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111000[i][k][l]: mesh3d_exchange_6_get_11_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set111000[i][k][l]: mesh3d_exchange_6_set_11_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010100[i][k][l]: mesh3d_exchange_6_get_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010100[i][k][l]: mesh3d_exchange_6_set_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110100[i][k][l]: mesh3d_exchange_6_get_11_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110100[i][k][l]: mesh3d_exchange_6_set_11_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange322_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111010[i][k][l]: mesh3d_exchange_6_get_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set111010[i][k][l]: mesh3d_exchange_6_set_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111001[i][k][l]: mesh3d_exchange_6_get_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111001[i][k][l]: mesh3d_exchange_6_set_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110110[i][k][l]: mesh3d_exchange_6_get_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110110[i][k][l]: mesh3d_exchange_6_set_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110101[i][k][l]: mesh3d_exchange_6_get_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110101[i][k][l]: mesh3d_exchange_6_set_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange323_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100111[i][k][l]: mesh3d_exchange_6_get_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100111[i][k][l]: mesh3d_exchange_6_set_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get011011[i][k][l]: mesh3d_exchange_6_get_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011011[i][k][l]: mesh3d_exchange_6_set_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111010[i][k][l]: mesh3d_exchange_6_get_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set111010[i][k][l]: mesh3d_exchange_6_set_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111001[i][k][l]: mesh3d_exchange_6_get_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111001[i][k][l]: mesh3d_exchange_6_set_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get101011[i][k][l]: mesh3d_exchange_6_get_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set101011[i][k][l]: mesh3d_exchange_6_set_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get111011[i][k][l]: mesh3d_exchange_6_get_11_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111011[i][k][l]: mesh3d_exchange_6_set_11_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110110[i][k][l]: mesh3d_exchange_6_get_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110110[i][k][l]: mesh3d_exchange_6_set_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110101[i][k][l]: mesh3d_exchange_6_get_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110101[i][k][l]: mesh3d_exchange_6_set_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get110111[i][k][l]: mesh3d_exchange_6_get_11_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110111[i][k][l]: mesh3d_exchange_6_set_11_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010111[i][k][l]: mesh3d_exchange_6_get_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010111[i][k][l]: mesh3d_exchange_6_set_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange331_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011000[i][k][l]: mesh3d_exchange_6_get_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set011000[i][k][l]: mesh3d_exchange_6_set_01_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100100[i][k][l]: mesh3d_exchange_6_get_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l]);
+    cf set100100[i][k][l]: mesh3d_exchange_6_set_10_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011100[i][k][l]: mesh3d_exchange_6_get_01_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011100[i][k][l]: mesh3d_exchange_6_set_01_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101000[i][k][l]: mesh3d_exchange_6_get_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l]);
+    cf set101000[i][k][l]: mesh3d_exchange_6_set_10_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get111100[i][k][l]: mesh3d_exchange_6_get_11_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111100[i][k][l]: mesh3d_exchange_6_set_11_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101100[i][k][l]: mesh3d_exchange_6_get_10_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D121][i][k][l]);
+    cf set101100[i][k][l]: mesh3d_exchange_6_set_10_11_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111000[i][k][l]: mesh3d_exchange_6_get_11_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D211][i][k][l]);
+    cf set111000[i][k][l]: mesh3d_exchange_6_set_11_10_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010100[i][k][l]: mesh3d_exchange_6_get_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010100[i][k][l]: mesh3d_exchange_6_set_01_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110100[i][k][l]: mesh3d_exchange_6_get_11_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110100[i][k][l]: mesh3d_exchange_6_set_11_01_00(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange332_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011101[i][k][l]: mesh3d_exchange_6_get_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011101[i][k][l]: mesh3d_exchange_6_set_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111110[i][k][l]: mesh3d_exchange_6_get_11_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111110[i][k][l]: mesh3d_exchange_6_set_11_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101101[i][k][l]: mesh3d_exchange_6_get_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101101[i][k][l]: mesh3d_exchange_6_set_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111010[i][k][l]: mesh3d_exchange_6_get_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set111010[i][k][l]: mesh3d_exchange_6_set_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111001[i][k][l]: mesh3d_exchange_6_get_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111001[i][k][l]: mesh3d_exchange_6_set_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get111101[i][k][l]: mesh3d_exchange_6_get_11_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111101[i][k][l]: mesh3d_exchange_6_set_11_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110110[i][k][l]: mesh3d_exchange_6_get_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110110[i][k][l]: mesh3d_exchange_6_set_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110101[i][k][l]: mesh3d_exchange_6_get_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110101[i][k][l]: mesh3d_exchange_6_set_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011110[i][k][l]: mesh3d_exchange_6_get_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011110[i][k][l]: mesh3d_exchange_6_set_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101110[i][k][l]: mesh3d_exchange_6_get_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set101110[i][k][l]: mesh3d_exchange_6_set_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange333_6(`in name nf,name nfs,name u, `out name v)
+{ df b; // [DIRs] [][][] real[][][]: borders
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get100111[i][k][l]: mesh3d_exchange_6_get_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100111[i][k][l]: mesh3d_exchange_6_set_10_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get010110[i][k][l]: mesh3d_exchange_6_get_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010110[i][k][l]: mesh3d_exchange_6_set_01_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get011101[i][k][l]: mesh3d_exchange_6_get_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011101[i][k][l]: mesh3d_exchange_6_set_01_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get011111[i][k][l]: mesh3d_exchange_6_get_01_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011111[i][k][l]: mesh3d_exchange_6_set_01_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111110[i][k][l]: mesh3d_exchange_6_get_11_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111110[i][k][l]: mesh3d_exchange_6_set_11_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get011011[i][k][l]: mesh3d_exchange_6_get_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011011[i][k][l]: mesh3d_exchange_6_set_01_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get101101[i][k][l]: mesh3d_exchange_6_get_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101101[i][k][l]: mesh3d_exchange_6_set_10_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get111010[i][k][l]: mesh3d_exchange_6_get_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set111010[i][k][l]: mesh3d_exchange_6_set_11_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get011001[i][k][l]: mesh3d_exchange_6_get_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set011001[i][k][l]: mesh3d_exchange_6_set_01_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get101111[i][k][l]: mesh3d_exchange_6_get_10_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set101111[i][k][l]: mesh3d_exchange_6_set_10_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get100110[i][k][l]: mesh3d_exchange_6_get_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set100110[i][k][l]: mesh3d_exchange_6_set_10_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get111001[i][k][l]: mesh3d_exchange_6_get_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111001[i][k][l]: mesh3d_exchange_6_set_11_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011010[i][k][l]: mesh3d_exchange_6_get_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D211][i][k][l]);
+    cf set011010[i][k][l]: mesh3d_exchange_6_set_01_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get101011[i][k][l]: mesh3d_exchange_6_get_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l]);
+    cf set101011[i][k][l]: mesh3d_exchange_6_set_10_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=nf[1]-1..nf[1]-1 for l=1..nf[2]-2
+  {
+    cf get111011[i][k][l]: mesh3d_exchange_6_get_11_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D211][i][k][l]);
+    cf set111011[i][k][l]: mesh3d_exchange_6_set_11_10_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=0..0
+  {
+    cf get101001[i][k][l]: mesh3d_exchange_6_get_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l]);
+    cf set101001[i][k][l]: mesh3d_exchange_6_set_10_10_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=0..0
+  {
+    cf get111101[i][k][l]: mesh3d_exchange_6_get_11_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111101[i][k][l]: mesh3d_exchange_6_set_11_11_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=nf[1]-1..nf[1]-1 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101010[i][k][l]: mesh3d_exchange_6_get_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l]);
+    cf set101010[i][k][l]: mesh3d_exchange_6_set_10_10_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=nf[2]-1..nf[2]-1
+  {
+    cf get110110[i][k][l]: mesh3d_exchange_6_get_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110110[i][k][l]: mesh3d_exchange_6_set_11_01_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=0..0 for l=0..0
+  {
+    cf get100101[i][k][l]: mesh3d_exchange_6_get_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l]);
+    cf set100101[i][k][l]: mesh3d_exchange_6_set_10_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=0..0
+  {
+    cf get110101[i][k][l]: mesh3d_exchange_6_get_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110101[i][k][l]: mesh3d_exchange_6_set_11_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get110111[i][k][l]: mesh3d_exchange_6_get_11_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set110111[i][k][l]: mesh3d_exchange_6_set_11_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=1..nf[2]-2
+  {
+    cf get010111[i][k][l]: mesh3d_exchange_6_get_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010111[i][k][l]: mesh3d_exchange_6_set_01_01_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=0..0 for l=0..0
+  {
+    cf get010101[i][k][l]: mesh3d_exchange_6_get_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set010101[i][k][l]: mesh3d_exchange_6_set_01_01_01(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=0..0 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get011110[i][k][l]: mesh3d_exchange_6_get_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set011110[i][k][l]: mesh3d_exchange_6_set_01_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+  for i=nf[0]-1..nf[0]-1 for k=1..nf[1]-2 for l=nf[2]-1..nf[2]-1
+  {
+    cf get101110[i][k][l]: mesh3d_exchange_6_get_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D121][i][k][l]);
+    cf set101110[i][k][l]: mesh3d_exchange_6_set_10_11_10(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D101][i][k+1][l],
+      `out v[i][k][l]);
+  }
+  for i=1..nf[0]-2 for k=1..nf[1]-2 for l=1..nf[2]-2
+  {
+    cf get111111[i][k][l]: mesh3d_exchange_6_get_11_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      `out b[$D011][i][k][l],b[$D101][i][k][l],b[$D110][i][k][l],b[$D112][i][k][l],b[$D121][i][k][l],b[$D211][i][k][l]);
+    cf set111111[i][k][l]: mesh3d_exchange_6_set_11_11_11(`in nfs[0][i],nfs[1][k],nfs[2][l],u[i][k][l],
+      b[$D211][i-1][k][l],b[$D121][i][k-1][l],b[$D112][i][k][l-1],b[$D110][i][k][l+1],b[$D101][i][k+1][l],b[$D011][i+1][k][l],
+      `out v[i][k][l]);
+  }
+}
+
+sub mesh3d_exchange_6(`in name nf,name nfs,name u, `out name v)
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// u   : [][][] real[][][] : fragmented 3D array (before exchange)
+// v   : [][][] real[][][] : fragmented 3D array (after exchange)
+{
+  if (nf[0] == 1)
+  {
+    if (nf[1] == 1)
+    {
+      if (nf[2] == 1) cf ex111: mesh3d_exchange111_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex112: mesh3d_exchange112_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex113: mesh3d_exchange113_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] == 2)
+    {
+      if (nf[2] == 1) cf ex121: mesh3d_exchange121_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex122: mesh3d_exchange122_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex123: mesh3d_exchange123_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] >= 3)
+    {
+      if (nf[2] == 1) cf ex131: mesh3d_exchange131_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex132: mesh3d_exchange132_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex133: mesh3d_exchange133_6(`in nf,nfs,u, `out v);
+    }
+  }
+  if (nf[0] == 2)
+  {
+    if (nf[1] == 1)
+    {
+      if (nf[2] == 1) cf ex211: mesh3d_exchange211_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex212: mesh3d_exchange212_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex213: mesh3d_exchange213_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] == 2)
+    {
+      if (nf[2] == 1) cf ex221: mesh3d_exchange221_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex222: mesh3d_exchange222_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex223: mesh3d_exchange223_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] >= 3)
+    {
+      if (nf[2] == 1) cf ex231: mesh3d_exchange231_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex232: mesh3d_exchange232_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex233: mesh3d_exchange233_6(`in nf,nfs,u, `out v);
+    }
+  }
+  if (nf[0] >= 3)
+  {
+    if (nf[1] == 1)
+    {
+      if (nf[2] == 1) cf ex311: mesh3d_exchange311_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex312: mesh3d_exchange312_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex313: mesh3d_exchange313_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] == 2)
+    {
+      if (nf[2] == 1) cf ex321: mesh3d_exchange321_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex322: mesh3d_exchange322_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex323: mesh3d_exchange323_6(`in nf,nfs,u, `out v);
+    }
+    if (nf[1] >= 3)
+    {
+      if (nf[2] == 1) cf ex331: mesh3d_exchange331_6(`in nf,nfs,u, `out v);
+      if (nf[2] == 2) cf ex332: mesh3d_exchange332_6(`in nf,nfs,u, `out v);
+      if (nf[2] >= 3) cf ex333: mesh3d_exchange333_6(`in nf,nfs,u, `out v);
+    }
+  }
+}
+
+#undef D000
+#undef D001
+#undef D002
+#undef D010
+#undef D011
+#undef D012
+#undef D020
+#undef D021
+#undef D022
+#undef D100
+#undef D101
+#undef D102
+#undef D110
+#undef D111
+#undef D112
+#undef D120
+#undef D121
+#undef D122
+#undef D200
+#undef D201
+#undef D202
+#undef D210
+#undef D211
+#undef D212
+#undef D220
+#undef D221
+#undef D222
+

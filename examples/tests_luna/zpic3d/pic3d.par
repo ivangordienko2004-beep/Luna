@@ -1,0 +1,38 @@
+# Pic3D configuration file
+#--------------------------------------------------------------------------------
+# Format:
+#   parameter_id     parameter_value        anything you want
+#--------------------------------------------------------------------------------
+
+# Time parameters
+ nt         10      # int : total number of time steps
+ nts         0      # int : number of time steps between logs (0 - do not write logs)
+ tau      0.1    # real : time step
+
+# Domain parameters
+ nx       100      # int : mesh size X
+ ny       100      # int : mesh size Y
+ nz       100      # int : mesh size Z
+ xn       1.0      # real : domain size X
+ yn       1.0      # real : domain size Y
+ zn       1.0      # real : domain size Z
+
+# Domain fragmentation parameters
+ nfx      4        # int : subdomains grid size X
+ nfy      4        # int : subdomains grid size Y
+ nfz      4        # int : subdomains grid size Z
+
+# Particles parameters
+ np      1000   # int : number of particles
+ pm      0.5       # real : particles total mass
+ radius  0.2       # real : initial particles distribution parameter: radius of a circle/ball/...
+ dvr     0.0       # real : initial particles distribution parameter: radius velocity dispersions
+ dvf     0.0       # real : initial particles distribution parameter: angle velocity dispersions
+ dvz     0.0       # real : initial particles distribution parameter: Z velocity dispersions
+
+# Other parameters
+ sm      0.5       # real : central body mass
+
+# Poisson solver parameters
+ eps     0.1      # real : Poisson solver precision (stop threshold)
+ w       1.0       # real : Poisson solver acceleration parameter

@@ -1,0 +1,999 @@
+
+//------------------------------------------
+// Mesh3D_log LuNA subroutines library
+// Version 0.01 fix 22.08.2016
+// Depends: Basic,Mesh3D
+//------------------------------------------
+
+import c_write2d_subdomain(`in string `filename,int `n0,int `n1,value `u) as write2d_subdomain;
+import c_write2d_part_subdomain(`in string `filename,int `n0,int `n1,int `nfs0, int `nfs1,int `nf00,int `nf01,int `nb,value `u,value prev, `out name `next) as write2d_part_subdomain;
+
+import c_gnuplot_script_init(`in string `scriptname, `out name `next) as gnuplot_script_init;
+import c_gnuplot_script_add(`in string `scriptname,string `filename,int `n0,int `n1,value `prev, `out name `next) as gnuplot_script_add;
+
+//-----------------------------------------------------------------------------
+
+sub write2d_split(`in string str,int it,int nf0,int nf1,name nfs0,name nfs1,name u)
+// str       : string : part of file name
+// it        : int    : number of time step
+// nf0,nf1   : int    : 2D subdomains grid sizes
+// nfs0,nfs1 : [] int : subdomains sizes
+// u         : [][] real[][] : array to write
+{
+  for i=0..nf0-1 for j=0..nf1-1
+  { df filename;
+    cf wr0: sprintf_ddd(filename,str+"%06d_%03d_%03d.dat",it,i,j);
+    cf wr1: write2d_subdomain(`in filename,nfs0[i],nfs1[j],u[i][j]);
+  }
+}
+
+sub write2d(`in string str,int it,int n0,int n1,int nf0,int nf1,name nfs0,name nfs1,name nf00,name nf01,int nb,name u)
+// str       : string  : part of file name
+// it        : int     : number of time step
+// n0,n1     : int     : 2D mesh sizes
+// nf0,nf1   : int     : 2D subdomains grid sizes
+// nfs0,nfs1 : [] int  : subdomains sizes (with borders)
+// nf00,nf01 : [] int  : subdomains starts (global cell numbers) (with borders)
+// nb        : int     : border size
+// u         : [][] real[][] : array to write
+{ df filename,seq;
+  cf wr0: assign_int(`in 0, `out seq[0]);
+  cf wr1: sprintf_d(filename,str+"%06d.dat",it);
+  for i=0..nf0-1 for j=0..nf1-1
+    let ij = i*nf1+j
+      cf wr2: write2d_part_subdomain(`in filename,n0,n1,nfs0[i],nfs1[j],nf00[i],nf01[i],nb,u[i][j],seq[ij], `out seq[ij+1]);
+}
+
+sub write2d_split_plt(`in string str,int it,int nf0,int nf1,name nfs0,name nfs1,name u,string scriptname,name prev, `out name next)
+// str       : string : part of file name
+// it        : int    : number of time step
+// nf0,nf1   : int    : 2D subdomains grid sizes
+// nfs0,nfs1 : [] int : subdomains sizes
+// u         : [][] real[][] : array to write
+{ df seqplt;
+  cf wr0: assign(`in prev, `out seqplt[0]);
+  for i=0..nf0-1 for j=0..nf1-1
+  { df filename;
+    cf wr1: sprintf_ddd(filename,str+"%06d_%03d_%03d.dat",it,i,j);
+    //puts("write2d_split_plt["+i+"]["+j+"] : "+nfs0[i]+" x "+nfs1[j]);
+    cf wr2: write2d_subdomain(`in filename,nfs0[i],nfs1[j],u[i][j]);
+    cf wr3: gnuplot_script_add(`in scriptname,filename,nfs0[i],nfs1[j],seqplt[i*nf1+j], `out seqplt[i*nf1+j+1]);
+  }
+  cf wr4: assign(`in seqplt[nf0*nf1], `out next);
+}
+
+sub write2d_plt(`in string str,int it,int n0,int n1,int nf0,int nf1,name nfs0,name nfs1,name nf00,name nf01,int nb,name u,string scriptname,name prev, `out name next)
+// str       : string  : part of file name
+// it        : int     : number of time step
+// n0,n1     : int     : 2D mesh sizes
+// nf0,nf1   : int     : 2D subdomains grid sizes
+// nfs0,nfs1 : [] int  : subdomains sizes (with borders)
+// nf00,nf01 : [] int  : subdomains starts (global cell numbers) (with borders)
+// nb        : int     : border size
+// u         : [][] real[][] : array to write
+{ df filename,seq;
+  cf wr0: assign_int(`in 0, `out seq[0]);
+  cf wr1: sprintf_d(filename,str+"%06d.dat",it);
+  for i=0..nf0-1 for j=0..nf1-1
+    let ij = i*nf1+j
+      cf wr2: write2d_part_subdomain(`in filename,n0,n1,nfs0[i],nfs1[j],nf00[i],nf01[j],nb,u[i][j],seq[ij], `out seq[ij+1]);
+  cf wr3: gnuplot_script_add(`in scriptname,filename,n0,n1,prev, `out next);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Split output
+
+sub log_sxy_split(`in string str,int it,name nf,name nfs,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_split(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy);
+}
+
+sub log_sxz_split(`in string str,int it,name nf,name nfs,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_split(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz);
+}
+
+sub log_syz_split(`in string str,int it,name nf,name nfs,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_split(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz);
+}
+
+sub log_xy_split(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int lg)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]);
+  cf wrt: write2d_split(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy);
+}
+
+sub log_xz_split(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int kg)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]);
+  cf wrt: write2d_split(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz);
+}
+
+sub log_yz_split(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int ig)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]);
+  cf wrt: write2d_split(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Split,gnuplot output
+
+sub log_sxy_split_plt(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy,scriptname,prev, `out next);
+}
+
+sub log_sxz_split_plt(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz,scriptname,prev, `out next);
+}
+
+sub log_syz_split_plt(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz,scriptname,prev, `out next);
+}
+
+sub log_xy_split_plt(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int lg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]);
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy,scriptname,prev, `out next);
+}
+
+sub log_xz_split_plt(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int kg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]);
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz,scriptname,prev, `out next);
+}
+
+sub log_yz_split_plt(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int ig,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]);
+  cf wrt: write2d_split_plt(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz,scriptname,prev, `out next);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Joined output
+
+sub log_sxy(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy);
+}
+
+sub log_sxz(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz);
+}
+
+sub log_syz(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz);
+}
+
+sub log_xy(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int lg)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]);
+  cf wrt: write2d(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy);
+}
+
+sub log_xz(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int kg)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]);
+  cf wrt: write2d(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz);
+}
+
+sub log_yz(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int ig)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]);
+  cf wrt: write2d(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Joined,gnuplot output
+
+sub log_sxy_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_sxz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_syz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+sub log_xy_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int lg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]);
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_xz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int kg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]);
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_yz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int ig,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]);
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Joined,gnuplot,output
+
+sub log_sxy_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_sxz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_syz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+sub log_xy_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int lg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]);
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_xz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int kg,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]);
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_yz_plt(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int ig,string scriptname,name prev, `out name next)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]);
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Joined,gnuplot,used output
+
+sub log_sxy_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_sxz_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_syz_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+sub log_xy_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int lg,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]) >> (used_u[i][k][l]);
+    if (lg<$L2G(1,nf0[2][l]) || lg>=$L2G(nfs[2][l]-1,nf0[2][l])) cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[1],nf[0],nf[1],nfs[0],nfs[1],nf0[0],nf0[1],1,uxy,scriptname,prev, `out next);
+}
+
+sub log_xz_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int kg,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]) >> (used_u[i][k][l]);
+    if (kg<$L2G(1,nf0[1][k]) || kg>=$L2G(nfs[1][k]-1,nf0[1][k])) cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_plt(`in str,it,n[0],n[2],nf[0],nf[2],nfs[0],nfs[2],nf0[0],nf0[2],1,uxz,scriptname,prev, `out next);
+}
+
+sub log_yz_plt_used(`in string str,int it,name n,name nf,name nfs,name nf0,int nb,name u,int ig,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// n   : [3] int : 3D mesh sizes
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]) >> (used_u[i][k][l]);
+    if (ig<$L2G(1,nf0[0][i]) || ig>=$L2G(nfs[0][i]-1,nf0[0][i])) cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_plt(`in str,it,n[1],n[2],nf[1],nf[2],nfs[1],nfs[2],nf0[1],nf0[2],1,uyz,scriptname,prev, `out next);
+}
+
+//-------------------------------------------------------------------------------------------------------------------------------
+// Split,gnuplot,used output
+
+sub log_sxy_split_plt_used(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 let nxy=nfs[0][i]*nfs[1][k]
+  { if (nf[2]==1) cf copy: copy(`in u2d[i][k][0], `out uxy[i][k]);
+    if (nf[2]==2) cf add0: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out uxy[i][k]);
+    if (nf[2]>2)
+    { cf add1: real1d_add(`in nxy,u2d[i][k][0],u2d[i][k][1], `out s[i][k][1]);
+      for l=2..nf[2]-2 cf add2: real1d_add(`in nxy,s[i][k][l-1],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxy,s[i][k][nf[2]-2],u2d[i][k][nf[2]-1], `out uxy[i][k]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy,scriptname,prev, `out next);
+}
+
+sub log_sxz_split_plt_used(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for i=0..nf[0]-1 for l=0..nf[2]-1 let nxz=nfs[0][i]*nfs[2][l]
+  { if (nf[1]==1) cf copy: copy(`in u2d[i][0][l], `out uxz[i][l]);
+    if (nf[1]==2) cf add0: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out uxz[i][l]);
+    if (nf[1]>2)
+    { cf add1: real1d_add(`in nxz,u2d[i][0][l],u2d[i][1][l], `out s[i][1][l]);
+      for k=2..nf[1]-2 cf add2: real1d_add(`in nxz,s[i][k-1][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nxz,s[i][nf[1]-2][l],u2d[i][nf[1]-1][l], `out uxz[i][l]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz,scriptname,prev, `out next);
+}
+
+sub log_syz_split_plt_used(`in string str,int it,name nf,name nfs,int nb,name u,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+{
+  df u2d,s,    // [][][] real[][]
+     uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf sum: real3d_sum_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l], `out u2d[i][k][l]) >> (used_u[i][k][l]);
+  for k=0..nf[1]-1 for l=0..nf[2]-1 let nyz=nfs[1][k]*nfs[2][l]
+  { if (nf[0]==1) cf copy: copy(`in u2d[0][k][l], `out uyz[k][l]);
+    if (nf[0]==2) cf add0: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out uyz[k][l]);
+    if (nf[0]>2)
+    { cf add1: real1d_add(`in nyz,u2d[0][k][l],u2d[1][k][l], `out s[1][k][l]);
+      for i=2..nf[0]-2 cf add2: real1d_add(`in nyz,s[i-1][k][l],u2d[i][k][l], `out s[i][k][l]);
+      cf add3: real1d_add(`in nyz,s[nf[0]-2][k][l],u2d[nf[0]-1][k][l], `out uyz[k][l]);
+    }
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz,scriptname,prev, `out next);
+}
+
+sub log_xy_split_plt_used(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int lg,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// lg  : int : global Z index of XY layer to save
+{
+  df uxy;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (lg>=$L2G(1,nf0[2][l]) && lg<$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf sel: real3d_select_xy(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],lg, `out uxy[i][k]) >> (used_u[i][k][l]);
+    if (lg<$L2G(1,nf0[2][l]) || lg>=$L2G(nfs[2][l]-1,nf0[2][l]))
+      cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[1],nfs[0],nfs[1],uxy,scriptname,prev, `out next);
+}
+
+sub log_xz_split_plt_used(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int kg,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// kg  : int : global Y index of XZ layer to save
+{
+  df uxz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (kg>=$L2G(1,nf0[1][k]) && kg<$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf sel: real3d_select_xz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],kg, `out uxz[i][l]) >> (used_u[i][k][l]);
+    if (kg<$L2G(1,nf0[1][k]) || kg>=$L2G(nfs[1][k]-1,nf0[1][k]))
+      cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[0],nf[2],nfs[0],nfs[2],uxz,scriptname,prev, `out next);
+}
+
+sub log_yz_split_plt_used(`in string str,int it,name nf,name nfs,name nf0,int nb,name u,int ig,string scriptname,name prev, `out name next, `used name used_u)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// nfs : [3][] int : subdomains sizes (with borders)
+// nf0 : [3][] int : subdomains starts (global cell number) (with borders)
+// nb  : int : border size
+// u   : [][][] real[][][] : array to write
+// ig  : int : global X index of YZ layer to save
+{
+  df uyz;      // [][] real[][]
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    if (ig>=$L2G(1,nf0[0][i]) && ig<$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf sel: real3d_select_yz(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],nb,u[i][k][l],ig, `out uyz[k][l]) >> (used_u[i][k][l]);
+    if (ig<$L2G(1,nf0[0][i]) || ig>=$L2G(nfs[0][i]-1,nf0[0][i]))
+      cf use: empty0() >> (used_u[i][k][l]);
+  }
+  cf wrt: write2d_split_plt(`in str,it,nf[1],nf[2],nfs[1],nfs[2],uyz,scriptname,prev, `out next);
+}

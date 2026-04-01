@@ -1,0 +1,31 @@
+-include ${LO3_HOME}/scripts/Makefile.common
+
+default: libtest.so
+
+Makefile_gen: test.cpp
+	${PYTHON} ${LO3_HOME}/scripts/mkgen --out=libtest.so \
+		--compile-flags="${CXX_FLAGS}" --compiler="${MPICXX}" \
+		--link-flags="${LDFLAGS} -shared -fPIC" > Makefile_gen \
+			|| rm -rf Makefile_gen
+
+libtest.so: Makefile_gen
+	make -f Makefile_gen -j8
+
+test.cpp: test_recom.ja ${LO3_HOME}/scripts/fcmp2
+	${PYTHON} ${LO3_HOME}/scripts/fcmp2 test_recom.ja test.cpp
+
+test_recom.ja: test.ja ${LO3_HOME}/scripts/fcmp
+	${PYTHON} ${LO3_HOME}/scripts/fcmp test.ja test_recom.ja --only-requests
+
+test.ja: test.fa
+	${LUNAC_HOME}/lunac test.fa test.ja
+
+run: libtest.so
+	echo "LIBPATH: ${LD_LIBRARY_PATH}"
+	${LO3_HOME}/bin/rts libtest.so anonymous turtle
+
+mpirun: libtest.so
+	${MPIRUN} -np ${MPIRUN_NP} ${LO3_HOME}/bin/rts libtest.so anonymous turtle
+
+clean:
+	rm -rf core test.cpp test.ja Makefile_gen *.o libtest.so *_test.cpp test_recom.ja

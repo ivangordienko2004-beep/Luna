@@ -1,0 +1,106 @@
+
+//------------------------------------------
+// Basic LuNA subroutines library
+// Version 0.02 (17.05.2016)
+//------------------------------------------
+
+import c_empty0() as empty0;
+import c_empty1(value `df) as empty;
+import c_empty1(value `df) as empty1;
+import c_empty2(value `df1,value `df2) as empty2;
+import c_empty3(value `df1,value `df2,value `df3) as empty3;
+import c_empty4(value `df1,value `df2,value `df3,value `df4) as empty4;
+import c_empty5(value `df1,value `df2,value `df3,value `df4,value `df5) as empty5;
+import c_empty6(value `df1,value `df2,value `df3,value `df4,value `df5,value `df6) as empty6;
+import c_df_ready(value `df,name `yes) as df_ready;
+import c_df_ready(value `df,name `yes) as df_ready;
+import c_df_ready2(value `df1,value `df2,name `yes) as df_ready2;
+import c_df_ready3(value `df1,value `df2,value `df3,name `yes) as df_ready3;
+import c_df_ready4(value `df1,value `df2,value `df3,value `df4,name `yes) as df_ready4;
+import c_check(value `df,string `msg) as check;
+import c_check_seq(`in value `df,string `msg,value `prev, `out name `next) as check_seq;
+
+import c_copy(value `df_in,name `df_out) as copy;
+import c_copy(value `df_in,name `df_out) as assign;
+import c_assign_int(int `val,name `df) as assign_int;
+import c_assign_real(real `val,name `df) as assign_real;
+import c_assign_string(`in string `val,name `df) as assign_string;
+
+import c_puts(`in string `str) as puts;
+import c_printf(`in string `str) as printf;
+import c_printf_d(`in string `str,int `val1) as printf_d;
+import c_printf_dd(`in string `str,int `val1,int `val2) as printf_dd;
+import c_printf_ddd(`in string `str,int `val1,int `val2,int `val3) as printf_ddd;
+import c_printf_dddd(`in string `str,int `val1,int `val2,int `val3,int `val4) as printf_dddd;
+import c_printf_r(`in string `str,real `val1) as printf_r;
+
+import c_puts_seq(`in string `str,value `prev, `out name `next) as puts_seq;
+import c_printf_seq(`in string `str,value `prev, `out name `next) as printf_seq;
+import c_printf_d_seq(`in string `str,int `val1,value `prev, `out name `next) as printf_d_seq;
+import c_printf_dd_seq(`in string `str,int `val1,int `val2,value `prev, `out name `next) as printf_dd_seq;
+import c_printf_ddd_seq(`in string `str,int `val1,int `val2,int `val3,value `prev, `out name `next) as printf_ddd_seq;
+import c_printf_dddd_seq(`in string `str,int `val1,int `val2,int `val3,int `val4,value `prev, `out name `next) as printf_dddd_seq;
+
+import c_sprintf_d(name `result,string `str,int `val1) as sprintf_d;
+import c_sprintf_dd(name `result,string `str,int `val1,int `val2) as sprintf_dd;
+import c_sprintf_ddd(name `result,string `str,int `val1,int `val2,int `val3) as sprintf_ddd;
+import c_sprintf_dddd(name `result,string `str,int `val1,int `val2,int `val3,int `val4) as sprintf_dddd;
+
+//import c_print_memory_usage() as print_memory_usage;
+//import c_ready_print_memory_usage(`in value `df) as ready_print_memory_usage;
+
+import c_sscanf_d(`in string `str, `out name `val1) as sscanf_d;
+import c_sscanf_dd(`in string `str, `out name `val1, name `val2) as sscanf_dd;
+import c_sscanf_ddd(`in string `str, `out name `val1, name `val2, name `val3) as sscanf_ddd;
+import c_sscanf_dddd(`in string `str, `out name `val1, name `val2, name `val3, name `val4) as sscanf_dddd;
+
+import c_real_add(`in real `v1,real `v2, `out name `df) as real_max;
+import c_real_max(`in real `v1,real `v2, `out name `result) as real_add;
+
+import c_real1d_fill(`in int `n,real `val, `out name `x) as real1d_fill;
+import c_int1d_fill(`in int `n,int `val, `out name `x) as int1d_fill;
+import c_real1d_reduce_max(`in int `n,value `x, `out name `result) as real1d_reduce_max;
+import c_real1d_reduce_sum(`in int `n,value `x, `out name `result) as real1d_reduce_sum;
+import c_real1d_add(`in int `n,value `x1,value `x2, `out name `result) as real1d_add;
+import c_real1d_delta_abs_reduce_max(`in int n,value `x,value `y, `out name `result) as real1d_delta_abs_reduce_max;
+import c_real1d_delta_abs_reduce_max(`in int n,value `x,value `y, `out name `result) as real1d_delta_norma_inf;
+
+
+
+
+
+
+
+
+
+//line 70
+
+
+
+
+
+
+
+
+
+//line 80
+
+
+
+
+
+
+
+
+
+//line 90
+
+
+
+
+
+
+
+
+
+//line 100

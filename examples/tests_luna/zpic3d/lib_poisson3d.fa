@@ -1,0 +1,73 @@
+
+//------------------------------------------
+// Poisson3D LuNA subroutines library
+// Version 18.11.2016
+// Depends: Basic,Mesh3D,Mesh3D_exchange
+//------------------------------------------
+
+import c_poisson3d_step_implicit_subdomain(`in int `nfx,int `nfy,int `nfz,int `ifx,int `ify,int `ifz,
+              int `nx,int `ny,int `nz,real `hx,real `hy,real `hz,
+              real `wp,real `crhs,value `ro,value `fi, `out name `fi_new,name `delta) as poisson3d_step_implicit_subdomain;
+import c_poisson3d_step_explicit_subdomain(`in int `nfx,int `nfy,int `nfz,int `ifx,int `ify,int `ifz,
+              int `nx,int `ny,int `nz,real `hx,real `hy,real `hz,
+              real `wp,real `crhs,value `ro,value `fi, `out name `fi_new,name `delta) as poisson3d_step_explicit_subdomain;
+
+sub poisson3d_solve_explicit(`in name nf,name nfs,name h,real wp,real eps,real crhs,int nb,name ro,name fi_old, `out name fi_new,name count, `used name used_fi)
+// nf     : [3] int : 3D subdomains grid sizes
+// h      : [3] real : mesh steps
+// wp     : real : Poisson solver acceleration parameter
+// eps    : real : Poisson solver precision
+// crhs   : coefficient at right hand side
+// ro     : [][][] real[][][] : right hand side >> used_ro
+// fi_old : [][][] real[][][] : initial values >> used_fi
+// fi_new : [][][] real[][][] : result (new)
+// count  : int : number of poisson solver iterations
+{ df fi,       // : [] [][][] real[][][] : solution
+     delta,    // : [] real : max difference
+     fi_ready; // : int
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf cpin[i][k][l]: copy(`in fi_old[i][k][l], `out fi[0][i][k][l]) >> (used_fi[i][k][l]);
+  cf i_delta0: assign(`in eps, `out delta[0]);
+  while delta[cnt] >= eps, cnt=0..out count
+  { df fit, // : [] [][][] real[][][] : solution before exchange
+       d;   // : [][][] real : max difference
+    for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+      cf slv[cnt][i][k][l]: poisson3d_step_explicit_subdomain(`in nf[0],nf[1],nf[2],i,k,l,nfs[0][i],nfs[1][k],nfs[2][l],h[0],h[1],h[2],wp,crhs,ro[i][k][l],fi[cnt][i][k][l], `out fit[i][k][l],d[i][k][l]) --> (fi[cnt][i][k][l]);
+    cf exch[cnt]: mesh3d_exchange_6(`in nf,nfs,fit, `out fi[cnt+1]);
+    cf max[cnt]: array3d_real_reduce_max_real(`in nf,d, `out delta[cnt+1]) --> (delta[cnt]);
+    if ((cnt+1)%10==0)
+    { cf prnd[cnt]: puts("P["+int(cnt+1)+"]: "+delta[cnt+1]);
+      //cf memp: ready_print_memory_usage(`in d[0][0][0]);
+    }
+  }
+  cf exchout: mesh3d_exchange_27(`in nf,nfs,fi[count], `out fi_new);
+}
+
+sub poisson3d_solve_implicit(`in name nf,name nfs,name h,real wp,real eps,real crhs,int nb,name ro,name fi_old, `out name fi_new,name count, `used name used_fi)
+// nf     : [3] int : 3D subdomains grid sizes
+// h      : [3] real : mesh steps
+// wp     : real : Poisson solver acceleration parameter
+// eps    : real : Poisson solver precision
+// crhs   : coefficient at right hand side
+// ro     : [][][] real[][][] : right hand side >> used_ro
+// fi_old : [][][] real[][][] : initial values >> used_fi
+// fi_new : [][][] real[][][] : result (new)
+// count  : int : number of poisson solver iterations
+{ df fi,       // : [] [][][] real[][][] : solution
+     delta,    // : [] real : max difference
+     fi_ready; // : int
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf cpin[i][k][l]: copy(`in fi_old[i][k][l], `out fi[0][i][k][l]) >> (used_fi[i][k][l]);
+  cf i_delta0: assign(`in eps, `out delta[0]);
+  while delta[cnt] >= eps, cnt=0..out count
+  { df fit, // : [] [][][] real[][][] : solution before exchange
+       d;   // : [][][] real : max difference
+    for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+      cf slv[cnt][i][k][l]: poisson3d_step_implicit_subdomain(`in nf[0],nf[1],nf[2],i,k,l,nfs[0][i],nfs[1][k],nfs[2][l],h[0],h[1],h[2],wp,crhs,ro[i][k][l],fi[cnt][i][k][l], `out fit[i][k][l],d[i][k][l]) --> (fi[cnt][i][k][l]);
+    cf exch[cnt]: mesh3d_exchange_6(`in nf,nfs,fit, `out fi[cnt+1]);
+    cf max[cnt]: array3d_real_reduce_max_real(`in nf,d, `out delta[cnt+1]) --> (delta[cnt]);
+    if ((cnt+1)%10==0)
+    { cf prnd[cnt]: puts("P["+int(cnt+1)+"]: "+delta[cnt+1]);
+      //cf memp: ready_print_memory_usage(`in d[0][0][0]);
+    }
+  }
+  cf exchout: mesh3d_exchange_27(`in nf,nfs,fi[count], `out fi_new);
+}

@@ -1,0 +1,36 @@
+/*
+ Initialization of data fragments and data dependencies.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+import c_print(value) as print;
+
+sub main()
+{
+	df x, N;
+
+	cf a: init(7, N) @ {
+		req_count N=3;
+		locator_cyclic: 1;
+	};
+	cf b: init(15, x[N]) @ {
+		request N;
+		req_count x[N]=2;
+	};
+	cf c: iprint(x[N]) @ {
+		request N;
+		request x[N];
+		locator_cyclic: 3;
+	};
+	cf d: print(x[N]) @ {
+		request N;
+		request x[N];
+		locator_cyclic: 4;
+	};
+} @ {
+	locator_cyclic x[i] => i;
+	locator_cyclic N => 0;
+	locator_cyclic b => 2;
+}
+

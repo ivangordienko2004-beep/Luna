@@ -1,0 +1,104 @@
+
+//------------------------------------------
+// Mesh3D LuNA subroutines library
+// Version 0.02 (17.05.2016)
+// Depends: Basic
+//------------------------------------------
+
+//-----------------------------------------------------------------------------
+// macros for cell coordinates transformation
+// local to global
+#define L2G(i,s) (($i)+($s))
+// global to local
+#define G2L(i,s) (($i)-($s))
+//-----------------------------------------------------------------------------
+
+import c_real3d_select_xy(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,int `nb,value `u,int `lg, `out name `uxy) as real3d_select_xy;
+import c_real3d_select_xz(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,int `nb,value `u,int `kg, `out name `uxz) as real3d_select_xz;
+import c_real3d_select_yz(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,int `nb,value `u,int `ig, `out name `uyz) as real3d_select_yz;
+
+import c_real3d_sum_xy(`in int `nx,int `ny,int `nz,int `nb,value `u3d, `out name `u2d) as real3d_sum_xy;
+import c_real3d_sum_xz(`in int `nx,int `ny,int `nz,int `nb,value `u3d, `out name `u2d) as real3d_sum_xz;
+import c_real3d_sum_yz(`in int `nx,int `ny,int `nz,int `nb,value `u3d, `out name `u2d) as real3d_sum_yz;
+
+import c_real3d_delta_abs_reduce_max(`in int `nx,int `ny,int `nz,int `nb,value `u,value `v, `out name `result) as real3d_delta_abs_reduce_max;
+import c_real3d_delta_abs_reduce_max(`in int `nx,int `ny,int `nz,int `nb,value `u,value `v, `out name `result) as real3d_delta_norma_inf;
+
+import c_get_fragment_parameters(`in int `n,int `nf,int `nb,int `ni, `out name `nfs,name `nf0) as get_fragment_parameters;
+
+//-----------------------------------------------------------------------------
+
+sub make_mesh1d_fragmentation(`in int n,int nf,int nb, `out name nfs,name nf0)
+// n    : int : number of elements to be fragmented into subdomains
+// nf   : int : number of fragments
+// nfs  : [] int : subdomains sizes (with borders)
+// nf0  : [] int : subdomains starts (global cell number) (with borders)
+{
+  for i=0..nf-1 cf getfp[i]: get_fragment_parameters(`in n,nf,nb,i, `out nfs[i],nf0[i]);
+}
+
+sub make_mesh3d_fragmentation(`in name n,name nf,int nb, `out name nfs,name nf0)
+// n    : [3] int : number of elements to be fragmented into subdomains
+// nf   : [3] int : number of fragments
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+{
+  cf frag0: make_mesh1d_fragmentation(`in n[0],nf[0],nb, `out nfs[0],nf0[0]);
+  cf frag1: make_mesh1d_fragmentation(`in n[1],nf[1],nb, `out nfs[1],nf0[1]);
+  cf frag2: make_mesh1d_fragmentation(`in n[2],nf[2],nb, `out nfs[2],nf0[2]);
+}
+
+sub print_mesh1d_fragmentation_seq(`in int n,int nf,name nfs,name nf0,name prev, `out name next)
+{ df seq;
+  printf_seq("["+n+" / "+nf+"]:",prev,seq[0]);
+  for i=0..nf-1 printf_seq(" "+nf0[i]+":["+nfs[i]+"]",seq[i],seq[i+1]);
+  printf_seq("\n",seq[nf],next);
+}
+
+sub print_mesh3d_fragmentation_seq(`in name n,name nf,name nfs,name nf0,name prev, `out name next)
+{ df seq;
+  print_mesh1d_fragmentation_seq(`in n[0],nf[0],nfs[0],nf0[0],prev  ,seq[1]);
+  print_mesh1d_fragmentation_seq(`in n[1],nf[1],nfs[1],nf0[1],seq[1],seq[2]);
+  print_mesh1d_fragmentation_seq(`in n[2],nf[2],nfs[2],nf0[2],seq[2],next  );
+}
+
+sub array3d_real_reduce_max_real(`in name nf,name v, `out name result)
+{ df r;
+  cf max0: assign_real(`in v[0][0][0], `out r[0]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    let ikl=i*nf[1]*nf[2]+k*nf[2]+l
+      cf max1[i][k][l]: assign_real(`in (r[ikl] > v[i][k][l]) ? real(r[ikl] ): real(v[i][k][l]), `out r[ikl+1]);
+  cf max2: assign_real(`in r[nf[0]*nf[1]*nf[2]], `out result);
+}
+
+sub array3d_int_reduce_sum_int(`in name nf,name v, `out name result)
+{ df r;
+  cf sum0: assign_int(`in 0, `out r[0]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    let ikl=i*nf[1]*nf[2]+k*nf[2]+l
+      cf sum1: assign_int(`in r[ikl]+v[i][k][l], `out r[ikl+1]);
+  cf sum2: assign_int(`in r[nf[0]*nf[1]*nf[2]], `out result);
+}
+
+sub array3d_real1d_reduce_sum_real1d(`in name nf,int n,name v, `out name result)
+{ df r;
+  cf sum0: real1d_fill(`in n,0.0, `out r[0]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    let ikl=i*nf[1]*nf[2]+k*nf[2]+l
+      cf sum1: real1d_add(`in n,r[ikl],v[i][k][l], `out r[ikl+1]);
+  cf sum2: copy(`in r[nf[0]*nf[1]*nf[2]], `out result);
+}
+
+sub array3d_real3d_delta_abs_reduce_max_real(`in name nf,name nfs,int nb,name u,name v, `out name result)
+{ df d;
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf md: real3d_delta_norma_inf(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l],v[i][k][l], `out d[i][k][l]);
+  array3d_real_reduce_max_real(`in nf,d, `out result);
+}
+
+sub array3d_real3d_delta_abs_reduce_max_real_used(`in name nf,name nfs,int nb,name u,name v, `out name result, `used name used_u,name used_v)
+{ df d;
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf md: real3d_delta_norma_inf(`in nfs[0][i],nfs[1][k],nfs[2][l],nb,u[i][k][l],v[i][k][l], `out d[i][k][l]) >> (used_u[i][k][l],used_v[i][k][l]);
+  array3d_real_reduce_max_real(`in nf,d, `out result);
+}

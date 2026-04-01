@@ -1,0 +1,207 @@
+#!/usr/bin/luna
+// IADE method with domain decomposition, Red-Black ordering and CG acceleration
+
+import c_empty(value `df) as empty;
+import c_empty2(value `df1,value `df2) as empty2;
+import c_isready(value `df,name `yes) as isready;
+
+import c_assign_int(int `val,name `df) as assign_int;
+import c_assign_real(real `val,name `df) as assign_real;
+import c_puts(`in string `str) as puts;
+import c_printf_d(`in string `str,int `val1) as printf_d;
+import c_printf_dd(`in string `str,int `val1,int `val2) as printf_dd;
+import c_printf_ddd(`in string `str,int `val1,int `val2,int val3) as printf_ddd;
+import c_printf_dddd(`in string `str,int `val1,int `val2,int `val3,int `val4) as printf_dddd;
+import c_printf_r(`in string `str,real `val1) as printf_r;
+
+//import c_printf_dd_memory_usage(`in string `str,int `val1,int `val2) as printf_dd_memory_usage;
+
+import c_sscanf_d(`in string `str, `out name `val1) as sscanf_d;
+import c_sscanf_dd(`in string `str, `out name `val1, name `val2) as sscanf_dd;
+import c_sscanf_ddd(`in string `str, `out name `val1, name `val2, name `val3) as sscanf_ddd;
+import c_sscanf_dddd(`in string `str, `out name `val1, name `val2, name `val3, name `val4) as sscanf_dddd;
+
+import c_init_fragment_size_start(int `n,int `nf,int `i,name `nfsR,name `nfsB,name `nf0R,name `nf0B) as init_fragment_size_start;
+
+import c_init_parameters(int `n,name `df) as init_parameters;
+import c_print_parameters(value `df_param) as print_parameters;
+import c_get_eps(value `df_param,name `df_eps) as get_eps;
+import c_init_exact(int `nfs,int `nf0,value `df_param,int `it,name `df_exact) as init_exact;
+import c_init_e_l(int `nfsR,int `nfsB,int `nfi,value `param,real `eprev,name `df_eR,name df_eB,name `df_lR,name `df_lB,name df_enext) as init_e_l;
+import c_init_v(int `nfs,int `nf0,value `param,value `df_l,name `df_v) as init_v;
+import c_init_s(int `nfs,int `nf0,value `param,value `df_e,name `df_s) as init_s;
+import c_init_d(int `nfs,int `nf0,value `param,value `df_e,name `df_d) as init_d;
+import c_init_x(int `nfs,int `nf0,value `param,name `df_x) as init_x;
+import c_init_y(int `nfs,int `nf0,value `param,real `value,real `value_left,name `df_y) as init_y;
+import c_init_rhs(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,name `df_fR,name `df_fB) as init_rhs;
+import c_get_init_y(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_sB,name `df_y_value,name `df_y_left) as get_init_y;
+import c_copy(value `df_in,name `df_out) as copy;
+import c_dset(int `n,real `value,name `df_out) as dset;
+import c_iadeR(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_yR,value `df_yB,value `df_fR,value `df_sR,value `df_lB,value `df_dR,value `df_vB,name `df_xR_new,name `df_yR_new) as iadeR;
+import c_iadeB(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_xB,value `df_yR,value `df_yB,value `df_fB,value `df_sB,value `df_lR,value `df_dB,value `df_vR,name `df_xB_new,name `df_yB_new) as iadeB;
+
+import c_init_r(int `nfsR,int nfsB,int `nf0R,int `nf0B,value `param,value `df_xR,value `df_xB,value `df_fR,value `df_fB,name `df_rR,name `df_rB) as init_r;
+import c_cgR(int `nfsR,int `nfsB,value `param,value `df_xR,value `df_rR,value `df_zR,value `df_zB,name `df_xR_new,name `df_rR_new,name `df_zR_new) as cgR;
+import c_cgB(int `nfsR,int `nfsB,value `param,value `df_xB,value `df_rB,value `df_zR,value `df_zB,name `df_xB_new,name `df_rB_new,name `df_zB_new) as cgB;
+
+import c_delta_norma_inf(value `df_x1,value `df_x2,name `df_result) as delta_norma_inf;
+import c_dmax3(real `x1,real `x2,real `x3,name `df_max) as dmax3;
+import c_get_B_left_border(int `nfsB,value `df_xB,name `df_xleft) as get_B_left_border;
+import c_get_R_right_border(int `nfsR,value `df_xR,name `df_xright) as get_R_right_border;
+import c_set_B_right_border(int `nfsB,value `df_xB,real `xleft,name `df_xB_new) as set_B_right_border;
+import c_set_R_left_border(int `nfsR,value `df_xR,real `xright,name `df_xR_new) as set_R_left_border;
+import c_save_file_d(value `df,string `name,int it) as save_file_d;
+import c_save_file_seq(int `nfsR,int `nfsB,int `nfi,int `nf,value `df_xR,value `df_xB,string `name,int `it,int `prev,name `next) as save_file_seq;
+
+sub save_fragmented_array(`in int nf, name nfsR, name nfsB, name xR, name xB, string filename, int it, int prev, `out name next)
+{ df seq;
+  assign_int(`in prev, `out seq[0]);
+  for j=0..nf-1 cf sav[j]: save_file_seq(`in nfsR[j],nfsB[j],j,nf,xR[j],xB[j],filename,it,seq[j], `out seq[j+1]) --> (seq[j]);
+  assign_int(`in seq[nf], `out next) --> (seq[nf]);
+}
+
+sub send_all_R_right_borders(`in int nf, name nfsR, name xR_in, `out name xR_out)
+{ df xright;
+  for j=0..nf-2 cf get[j]: get_R_right_border(`in nfsR[j],xR_in[j], `out xright[j]);
+  cf cp[0]: copy(`in xR_in[0], `out xR_out[0]);
+  for j=1..nf-1 cf set[j]: set_R_left_border(`in nfsR[j],xR_in[j],xright[j-1], `out xR_out[j]) --> (xright[j-1]);
+}
+
+sub send_all_B_left_borders(`in int nf, name nfsB, name xB_in, `out name xB_out)
+{ df xleft;
+  for j=1..nf-1 cf get[j]: get_B_left_border(`in nfsB[j],xB_in[j], `out xleft[j]);
+  cf cp[nf-1]: copy(`in xB_in[nf-1], `out xB_out[nf-1]);
+  for j=0..nf-2 cf set[j]: set_B_right_border(`in nfsB[j],xB_in[j],xleft[j+1], `out xB_out[j]) --> (xleft[j+1]);
+}
+
+sub delta_norma_inf_all(`in int nf, name xR1, name xB1, name xR2, name xB2, `out name delta)
+{ df dnR,dnB,dnmax;
+  for j=0..nf-1 cf dniR[j]: delta_norma_inf(xR1[j],xR2[j], `out dnR[j]);
+  for j=0..nf-1 cf dniB[j]: delta_norma_inf(xB1[j],xB2[j], `out dnB[j]);
+  cf dm0: assign_real(`in 0.0, `out dnmax[0]);
+  for j=0..nf-1 cf dm[0]: dmax3(`in dnR[j],dnB[j],dnmax[j], `out dnmax[j+1]) --> (dnR[j],dnB[j],dnmax[j]);
+  cf cp[0]: assign_real(`in dnmax[nf], `out delta) --> (dnmax[nf]);
+}
+
+sub solve(`in  int nf,name nfsR,name nfsB,name nf0R,name nf0B,name p,name xR_in,name xB_in,name yR_in,name yB_in,name fR,name fB,
+               name eR,name eB,name lR,name lB,name vR,name vB,name sR,name sB,name dR,name dB,int it,int ready,
+          `out name xR_out,name xB_out,name yR_out,name yB_out,name cnt)
+{
+  df delta,eps,iter,xR,xB,yR,yB,rR,rB,zR,zB,yRt,xRt,xBt,xBtt,xRr,xBr,zRt,zBt;
+  for j=0..nf-1
+  { cf cpixR[j]: copy(`in xR_in[j], `out xR[0][j]);
+    cf cpixB[j]: copy(`in xB_in[j], `out xB[0][j]);
+    cf cpiyR[j]: copy(`in yR_in[j], `out yR[0][j]);
+    cf cpiyB[j]: copy(`in yB_in[j], `out yB[0][j]);
+  }
+  
+  if (ready)
+  { cf eps1: get_eps(`in p, `out eps);
+    cf eps2: assign_real(`in eps, `out delta[0]);
+  }
+  while (delta[i] >= eps),i=0..out iter
+  {
+    for j=0..nf-1 cf iadeR[j]: iadeR(`in nfsR[j],nfsB[j],p,xR[i][j],xB[i][j],yR[i][j],yB[i][j],fR[j],sR[j],lB[j],dR[j],vB[j], `out xRt[i][j],yRt[i][j]);
+    cf yR2r: send_all_R_right_borders(`in nf,nfsR,yRt[i], `out yR[i+1]);
+    for j=0..nf-1 cf iadeB[j]: iadeB(`in nfsR[j],nfsB[j],p,xRt[i][j],xB[i][j],yR[i+1][j],yB[i][j],fB[j],sB[j],lR[j],dB[j],vR[j], `out xBt[i][j],yB[i+1][j]);
+    if (i==0)
+    { cf xRt2r: send_all_R_right_borders(`in nf,nfsR,xRt[0], `out xRr);
+      cf xBt2l: send_all_B_left_borders(`in nf,nfsB,xBt[0], `out xBr);
+      for j=0..nf-1 cf i_r[j]: init_r(`in nfsR[j],nfsB[j],nf0R[j],nf0B[j],p,xRr[j],xBr[j],fR[j],fB[j], `out rR[0][j],rB[0][j]) --> (xRr[j],xBr[j]);
+      for j=0..nf-1 cf cprzR[j]: copy(`in rR[0][j], `out zR[0][j]);
+      for j=0..nf-1 cf cprzB[j]: copy(`in rB[0][j], `out zB[0][j]);
+    }
+    cf zB2l: send_all_R_right_borders(`in nf,nfsR,zR[i], `out zRt[i]);
+    cf zR2r: send_all_B_left_borders(`in nf,nfsB,zB[i], `out zBt[i]);
+    for j=0..nf-1 cf cgr[j]: cgR(`in nfsR[j],nfsB[j],p,xRt[i][j],rR[i][j],zRt[i][j],zBt[i][j], `out xR[i+1][j],rR[i+1][j],zR[i+1][j]);
+    for j=0..nf-1 cf cgb[j]: cgB(`in nfsR[j],nfsB[j],p,xBt[i][j],rB[i][j],zRt[i][j],zBt[i][j], `out xBtt[i][j],rB[i+1][j],zB[i+1][j]);
+    cf xBtt2l: send_all_B_left_borders(`in nf,nfsB,xBtt[i], `out xB[i+1]);
+    cf nrm: delta_norma_inf_all(`in nf,xR[i],xB[i],xR[i+1],xB[i+1], `out delta[i+1]) --> (delta[i]);
+    for j=0..nf-1
+      cf free[j]: empty(`in delta[i+1]) --> (xRt[i][j],xBt[i][j],yRt[i][j],zRt[i][j],zBt[i][j],xBtt[i][j],
+                                             xR[i][j],xB[i][j],yR[i][j],yB[i][j],zR[i][j],zB[i][j],rR[i][j],rB[i][j]);
+  }
+
+  //cf prn: printf_dd_memory_usage("%6d: %3d\n",it,iter) --> (ready,eps); // Print memory usage
+  cf prn: printf_dd("%6d: %3d\n",it,iter) --> (eps); // Do not print memory usage
+
+  cf cpoxR: send_all_R_right_borders(`in nf, nfsR, xR[iter], `out xR_out);
+  for j=0..nf-2 cf free[j]: empty2(`in xR_out[j],xR_out[j+1]) --> (xR[iter][j]);
+  cf free[nf-1]: empty(`in xR_out[nf-1]) --> (xR[iter][nf-1]);
+  for j=0..nf-1 cf cpoxB[j]: copy(`in xB[iter][j], `out xB_out[j]) --> (xB[iter][j]);
+  for j=0..nf-1 cf cpoyR[j]: copy(`in yR[iter][j], `out yR_out[j]) --> (yR[iter][j],zR[iter][j],rR[iter][j]);
+  for j=0..nf-1 cf cpoyB[j]: copy(`in yB[iter][j], `out yB_out[j]) --> (yB[iter][j],zB[iter][j],rB[iter][j]);
+  cf cnt: assign_int(`in iter, `out cnt);
+}
+
+sub main(string args)
+{
+  df n,nf,nt,ns,nfsR,nfsB,nf0R,nf0B,p,   pR,xR,yR,eR,lR,vR,sR,dR,fR,exactR,
+     y0,yl,enext, cnt,count, seqe,seqx,  pB,xB,yB,eB,lB,vB,sB,dB,fB,exactB, ready;
+
+  cf i_n: assign_int(`in 10000000, `out n); // Mesh size
+  cf i_nf: assign_int(`in 4, `out nf);      // Number of fragments
+  cf i_nt: assign_int(`in 20, `out nt);     // Number of time steps
+  cf i_ns: assign_int(`in 100, `out ns); // Nuber of iterations between logs
+
+  //cf init: sscanf_ddd(`in args, `out n,nf,nt); // Obtain command line arguments: n, nf, nt
+  //cf prn: printf_ddd("Mesh/Fragments: %d / %d   Iterations: %d\n",n,nf,nt);
+
+  //cf init: sscanf_dddd(`in args, `out n,nf,nt,ns); // Obtain command line arguments: n, nf, nt, ns
+  cf prn: printf_dddd("Mesh/Fragments: %d / %d   Iterations: %d (%d)\n",n,nf,nt,ns);
+
+  cf ip: init_parameters(`in n, `out p);
+  cf i_enext: assign_real(`in 0.0, `out enext[0]);
+  cf i_count: assign_int(`in 0, `out count[0]);
+
+  for j=0..nf-1
+  { cf i_fs[j]: init_fragment_size_start(`in n,nf,j, `out nfsR[j],nfsB[j],nf0R[j],nf0B[j]);
+    cf i_el[j]: init_e_l(`in nfsR[j],nfsB[j],j,p,enext[j], `out eR[j],eB[j],lR[j],lB[j],enext[j+1]);
+    cf i_vR[j]: init_v(`in nfsR[j],nf0R[j],p,lR[j], `out vR[j]);
+    cf i_vB[j]: init_v(`in nfsB[j],nf0B[j],p,lB[j], `out vB[j]);
+    cf i_sR[j]: init_s(`in nfsR[j],nf0R[j],p,eR[j], `out sR[j]);
+    cf i_sB[j]: init_s(`in nfsB[j],nf0B[j],p,eB[j], `out sB[j]);
+    cf i_dR[j]: init_d(`in nfsR[j],nf0R[j],p,eR[j], `out dR[j]);
+    cf i_dB[j]: init_d(`in nfsB[j],nf0B[j],p,eB[j], `out dB[j]);
+    cf i_xR[j]: init_x(`in nfsR[j],nf0R[j],p, `out xR[0][j]);
+    cf i_xB[j]: init_x(`in nfsB[j],nf0B[j],p, `out xB[0][j]);
+    cf i_yR[j]: init_y(`in nfsR[j],nf0R[j],p,y0,yl, `out yR[0][j]);
+    cf i_yB[j]: init_y(`in nfsB[j],nf0B[j],p,y0,yl, `out yB[0][j]);
+  }
+  cf get_y: get_init_y(`in nfsR[0],nfsB[0],p,xR[0][0],xB[0][0],sB[0], `out y0,yl);
+
+  for it=0..nt-1
+  {
+    cf rdy[it]: isready(`in xR[it][0], `out ready[it]);
+    //=== Write intermediate results to files ===
+    if (ns!=0) if (it%ns==0) if (ready[it])
+    {
+      cf sqe: assign_int(`in 0, `out seqe[it][0]);
+      cf sqx: assign_int(`in 0, `out seqx[it][0]);
+      for j=0..nf-1 cf i_exR[j]: init_exact(`in nfsR[j],nf0R[j],p,it, `out exactR[it][j]);
+      for j=0..nf-1 cf i_exB[j]: init_exact(`in nfsB[j],nf0B[j],p,it, `out exactB[it][j]);
+      cf save_e: save_fragmented_array(`in nf,nfsR,nfsB,exactR[it],exactB[it],"e%05d",it,seqe[it][0], `out seqe[it][1]);
+      cf save_x: save_fragmented_array(`in nf,nfsR,nfsB,xR[it],xB[it],"x%05d",it,seqx[it][0], `out seqx[it][1]);
+    }
+    //===========================================
+
+    for j=0..nf-1 cf i_rhs[j]: init_rhs(`in nfsR[j],nfsB[j],p,xR[it][j],xB[it][j], `out fR[it][j],fB[it][j]);
+    cf solve: solve(`in  nf,nfsR,nfsB,nf0R,nf0B,p,xR[it],xB[it],yR[it],yB[it],fR[it],fB[it],eR,eB,lR,lB,vR,vB,sR,sB,dR,dB,it,ready[it],
+                    `out xR[it+1],xB[it+1],yR[it+1],yB[it+1],cnt[it]);
+    cf cnt: assign_int(`in count[it]+cnt[it], `out count[it+1]) --> (count[it],cnt[it]);
+    for j=0..nf-1 cf free[j]: empty(`in xR[it+1][j]) --> (xR[it][j],xB[it][j],yR[it][j],yB[it][j],fR[it][j],fB[it][j]);
+  }
+
+  //=== Write final results to files ==========
+  if (ns!=0) if (ready[nt-1])
+  { cf sqe: assign_int(`in 0, `out seqe[nt][0]);
+    cf sqx: assign_int(`in 0, `out seqx[nt][0]);
+    for j=0..nf-1 cf i_exR[j]: init_exact(`in nfsR[j],nf0R[j],p,nt, `out exactR[nt][j]);
+    for j=0..nf-1 cf i_exB[j]: init_exact(`in nfsB[j],nf0B[j],p,nt, `out exactB[nt][j]);
+    cf save_e: save_fragmented_array(`in nf,nfsR,nfsB,exactR[nt],exactB[nt],"e%05d",nt,seqe[nt][0], `out seqe[nt][1]);
+    cf save_x: save_fragmented_array(`in nf,nfsR,nfsB,xR[nt],xB[nt],"x%05d",nt,seqx[nt][0], `out seqx[nt][1]);
+  }
+  //===========================================
+
+  cf prn_cnt: printf_d("Count: %d\n",count[nt]);
+}

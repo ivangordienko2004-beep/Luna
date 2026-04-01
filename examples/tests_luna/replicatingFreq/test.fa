@@ -1,0 +1,38 @@
+/*
+ Initialization of data fragments and data dependencies with replicating on each third available node.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+
+sub main()
+{
+	df x;
+
+	cf a: init(123, x) @ {
+		locator_cyclic: 1;
+	};
+
+	iprint(x) @ {
+		locator_cyclic: 2;
+	};
+
+	iprint(x) @ {
+		locator_cyclic: 3;
+	};
+
+	iprint(x) @ {
+                locator_cyclic: 4;
+        };
+
+	iprint(x) @ {
+                locator_cyclic: 5;
+        };
+
+	iprint(x) @ {
+                locator_cyclic: 6;
+        };
+} @ {
+	locator_replicating x => 3;
+}
+

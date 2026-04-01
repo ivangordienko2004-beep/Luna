@@ -1,0 +1,840 @@
+#!/usr/bin/luna
+// 3D PIC method with 3D decomposition
+
+#include "lib_basic.fa"
+#include "lib_mesh3d.fa"
+#include "lib_mesh3d_log.fa"
+#include "lib_poisson3d.fa"
+#include "lib_mesh3d_exchange_6.fa"
+#include "lib_mesh3d_exchange_27.fa"
+#include "lib_mesh3d_exchange_sum_27.fa"
+#include "lib_mesh3d_exchange_particles_27.fa"
+
+// particles initial density distribution
+#define FILL_SQRT  1
+#define FILL_EXP   2
+#define FILL_LINE  3
+#define FILL_CONST 4
+
+#define PI 3.1415926535897932384626433832795
+
+import c_print_memory_usage() as print_memory_usage;
+import c_ready_print_memory_usage(`in value `df) as ready_print_memory_usage;
+
+//-----------------------------------------------------------------
+
+import c_print_one_particle(`in string `msg,int `np,value `p) as print_one_particle;
+
+//-----------------------------------------------------------------------------
+// Reading parameters
+//-----------------------------------------------------------------------------
+
+import c_check_file(`in string `filename, `out name `ok) as check_file;
+
+import c_read_parameters(`in string `filename, `out name `nt,name `nts,name `np,
+         name `nx,name `ny,name `nz,       name `nfx,name `nfy,name `nfz,
+         name `xn,name `yn,name `zn,       name `tau,name `pm,name `sm,
+         name `radius,name `dvr,name `dvf,name `dvz,    name `eps,name `w, name `ok) as read_parameters;
+
+import c_print_parameters(`in int `nt,int `nts,int `np,
+                        int `nx,int `ny,int `nz,
+                        int `nfx,int `nfy,int `nfz,
+                        real `xn,real `yn,real `zn,
+                        real `tau,real `pm,real `sm,
+                        real `radius,real `dvr,real `dvf,real `dvz,
+                        real `eps,real `w) as print_parameters;
+
+import c_print_parameters_seq(`in int `nt,int `nts,int `np,
+                        int `nx,int `ny,int `nz,
+                        int `nfx,int `nfy,int `nfz,
+                        real `xn,real `yn,real `zn,
+                        real `tau,real `pm,real `sm,
+                        real `radius,real `dvr,real `dvf,real `dvz,
+                        real `eps,real `w, value `prev, `out name `next) as print_parameters_seq;
+
+sub init_parameters(`in string args, `out name nt,name nts0,name np0,
+                 name n, name nf, name xn, name tau,name pm,name sm,
+                 name r0, name dv, name eps,name wp)
+// nt      // int : total number of time steps
+// nts0    // int : number of time steps between logs 
+// np0     // int : minimum required number of particles
+// n       // [3] int : 3D mesh sizes
+// nf      // [3] int : 3D subdomains grid sizes
+// xn      // [3] real : domain sizes
+// tau     // real : time step
+// pm      // real : particles total mass
+// sm      // real : central (sun) mass
+// r0      // real : initial distribution parameter: radius
+// dv      // [3] real : initial particles distribution parameters: radius, angle and Z velocity dispersions
+// eps     // real : Poisson solver precision
+// wp      // real : Poisson solver acceleration parameter
+{
+  df filename,file_ok,seqp;
+  // trying to use file name from main(args)
+  cf chkfle0: check_file(`in args, `out file_ok[0]);
+  if (file_ok[0]!=0) 
+  { cf cpfn1: assign_string(`in args, `out filename);
+    cf prnfn1: puts_seq("Using parameter file '"+filename+"'",file_ok[0],seqp[1]);
+    cf cpfok: copy(`in file_ok[0], `out file_ok[1]);
+  }
+  // trying to use default file name
+  if (file_ok[0]==0)
+  { if (args != "") cf prn0: puts_seq("Warning! Can't read provided parameter file '"+args+"'",file_ok[0],seqp[0]);
+    if (args == "") cf cpsq0: copy(`in file_ok[0], `out seqp[0]);
+    cf cpfn0: assign_string(`in "pic3d.par", `out filename);
+    cf chkfle1: check_file(`in filename, `out file_ok[1]);
+    if (file_ok[1]!=0) cf prn1: puts_seq("Using default parameter file '"+filename+"'",seqp[0],seqp[1]);
+    if (file_ok[1]==0) cf cpsq1: copy(`in seqp[0], `out seqp[1]);
+  }
+  // if ok trying to read
+  if (file_ok[0]!=0 || file_ok[1]!=0)
+  { df read_ok;
+    cf readpar: read_parameters(`in filename, `out nt,nts0,np0, n[0],n[1],n[2], nf[0],nf[1],nf[2], xn[0],xn[1],xn[2], tau,pm,sm,r0, dv[0],dv[1],dv[2], eps,wp, read_ok);
+    if (read_ok==0) cf prnfn0: puts_seq("Reading parameters from file '"+filename+"' failed!",seqp[1], `out seqp[2]);
+    if (read_ok!=0) cf cp: copy(`in seqp[1], `out seqp[2]);
+  }
+  // if not ok using defaults
+  if (file_ok[0]==0 && file_ok[1]==0)
+  { puts_seq("No default parameter file provided! Using default parameters.",seqp[1], `out seqp[2]);
+
+    cf init_nt: assign_int(`in 10, `out nt);
+    cf init_nts: assign_int(`in 1, `out nts0);
+    cf init_n0: assign_int(`in 100, `out n[0]);
+    cf init_n1: assign_int(`in 100, `out n[1]);
+    cf init_n2: assign_int(`in 100, `out n[2]);
+    cf init_nf0: assign_int(`in 1, `out nf[0]);
+    cf init_nf1: assign_int(`in 1, `out nf[1]);
+    cf init_nf2: assign_int(`in 1, `out nf[2]);
+    cf init_np0: assign_int(`in 100000, `out np0);
+
+    cf inti_xn0: assign_real(`in 1.0, `out xn[0]);
+    cf inti_xn1: assign_real(`in 1.0, `out xn[1]);
+    cf inti_xn2: assign_real(`in 1.0, `out xn[2]);
+    cf init_tau: assign_real(`in 0.001, `out tau);
+    cf init_pm:  assign_real(`in 1.0, `out pm);
+    cf init_sm:  assign_real(`in 0.0, `out sm);
+    cf init_r0:  assign_real(`in 0.2, `out r0);
+    cf init_dvr: assign_real(`in 0.0, `out dv[0]);
+    cf init_dvf: assign_real(`in 0.0, `out dv[1]);
+    cf init_dvz: assign_real(`in 0.0, `out dv[2]);
+    cf init_eps: assign_real(`in 0.001, `out eps);
+    cf init_wp:  assign_real(`in 1.8, `out wp);
+  }
+}
+
+//-----------------------------------------------------------------------------
+// Making domain fragmentation
+//-----------------------------------------------------------------------------
+
+sub init_subdomains_parameters(`in int nf,name nfs,name nf0,real h, `out name xf1,name xf2)
+// nf   : int : number of fragments
+// nfs  : [] int : subdomains sizes (with borders)
+// nf0  : [] int : subdomains starts (global cell number) (with borders)
+// h    : real : mesh step
+// xf1  : [nf] real : subdomain starts (global coordinates)
+// xf2  : [nf] real : subdomain ends (global coordinates)
+{
+  for i=0..nf-1
+  { cf init_xf1: assign_real(`in (nf0[i]+1)*h, `out xf1[i]);
+    cf init_xf2: assign_real(`in (nf0[i]+nfs[i]-1)*h, `out xf2[i]);
+  }
+}
+
+sub print_subdomains_parameters_seq(`in int nf,name xf1,name xf2,name prev, `out name next)
+{ df seq;
+  assign(prev,seq[0]);
+  for i=0..nf-1 printf_seq("("+xf1[i]+" - "+xf2[i]+")",seq[i],seq[i+1]);
+  printf_seq("\n",seq[nf],next);
+}
+
+sub print_xyz_seq(`in name nf,name nfs,name nf0,name h,name prev, `out name next)
+// nf   : [3] int : 3D subdomains grid sizes
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+// h    : [3] real : mesh steps
+{
+  df seq;
+  cf prn0: assign(`in prev, `out seq[0]);
+  for i=0..nf[0]-1 cf prnx: print_x_seq(`in i,nfs[0][i],nf0[0][i],h[0],seq[i], `our seq[i+1]);
+  for k=0..nf[1]-1 cf prny: print_y_seq(`in k,nfs[1][k],nf0[1][k],h[1],seq[nf[0]+k], `our seq[nf[0]+k+1]);
+  for l=0..nf[2]-1 cf prnz: print_z_seq(`in l,nfs[2][l],nf0[2][l],h[2],seq[nf[0]+nf[1]+l], `our seq[nf[0]+nf[1]+l+1]);
+  cf prn1: assign(`in seq[nf[0]+nf[1]+nf[2]], `out next);
+}
+
+//-----------------------------------------------------------------------------
+// Making initial particles distribution
+//-----------------------------------------------------------------------------
+import c_init_particles_full_subdomain(`in int `np,real `x1,real `y1,real `z1,real `x2,real `y2,real `z2, `out name `p,name `npfs) as init_particles_full_subdomain;
+import c_init_particles_circle_xy_subdomain(`in int `np,int kind,real `x1,real `y1,real `z1,real `x2,real `y2,real `z2,real `cx,real `cy,real `cz,real `radius, `out name `p,name `npfs) as init_particles_circle_xy_subdomain;
+import c_init_particles_circle_xz_subdomain(`in int `np,int kind,real `x1,real `y1,real `z1,real `x2,real `y2,real `z2,real `cx,real `cy,real `cz,real `radius, `out name `p,name `npfs) as init_particles_circle_xz_subdomain;
+import c_init_particles_circle_yz_subdomain(`in int `np,int kind,real `x1,real `y1,real `z1,real `x2,real `y2,real `z2,real `cx,real `cy,real `cz,real `radius, `out name `p,name `npfs) as init_particles_circle_yz_subdomain;
+import c_init_particles_ball_subdomain(`in int `np,int kind,real `x1,real `y1,real `z1,real `x2,real `y2,real `z2,real `cx,real `cy,real `cz,real `radius, `out name `p,name `npfs) as init_particles_ball_subdomain;
+
+import c_init_particles_velocity_z_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,
+  real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `dvr,real `dvf,real `dvz,int `wave,real `tau,real `emax,
+  value `fi,value `fx,value `fy,value `fz,int `np,value `p, `out name `p_new) as init_particles_velocity_z_subdomain;
+import c_init_particles_velocity_y_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,
+  real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `dvr,real `dvf,real `dvy,int `wave,real `tau,real `emax,
+  value `fi,value `fx,value `fy,value `fz,int `np,value `p, `out name `p_new) as init_particles_velocity_y_subdomain;
+import c_init_particles_velocity_x_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,
+  real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `dvr,real `dvf,real `dvz,int `wave,real `tau,real `emax,
+  value `fi,value `fx,value `fy,value `fz,int `np,value `p, `out name `p_new) as init_particles_velocity_x_subdomain;
+
+import c_init_particles_velocity_ball_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,
+  real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `dvr,real `dvf,real `dvz,real `tau,real `emax,
+  value `fi,value `fx,value `fy,value `fz,int `np,value `p, `out name `p_new) as init_particles_velocity_ball_subdomain;
+
+//import c_merge_particles_subdomain(`in value `p1, int `np1, value `p2, int `np2, `out name `p, name `np) as merge_particles_subdomain;
+
+sub init_particles_full(`in int np0,name nf,name xf1,name xf2, `out name p,name npfs,name np)
+// np0  : int : minimum required number of particles
+// nf   : [3] int : 3D subdomains grid sizes
+// xf1  : [3][] real : subdomain starts (global coordinates)
+// xf2  : [3][] real : subdomain ends (global coordinates)
+// p    : [][][] Particle[]: particles
+// npfs : [][][] int : number of particles in subdomains
+// np   : int : total number of particles
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf fill: init_particles_full_subdomain(`in np0,xf1[0][i],xf1[1][k],xf1[2][l],xf2[0][i],xf2[1][k],xf2[2][l], `out p[i][k][l],npfs[i][k][l]);
+  array3d_int_reduce_sum_int(`in nf,npfs, `out np);
+}
+
+sub init_particles_circle_xy(`in int np0,int kind,name nf,name xf1,name xf2,name cx,real r0, `out name p,name npfs,name np)
+// np0  : int : minimum required number of particles
+// kind : type of initial density ditribution
+// nf   : [3] int : 3D subdomains grid sizes
+// xf1  : [3][] real : subdomain starts (global coordinates)
+// xf2  : [3][] real : subdomain ends (global coordinates)
+// cx   : [3] real : coordinates of domain center
+// r0   : real : initial distribution parameter: radius
+// p    : [][][] Particle[]: particles
+// npfs : [][][] int : number of particles in subdomains
+// np   : int : total number of particles
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf fill: init_particles_circle_xy_subdomain(`in np0,kind,xf1[0][i],xf1[1][k],xf1[2][l],xf2[0][i],xf2[1][k],xf2[2][l],cx[0],cx[1],cx[2],r0,
+                                                `out p[i][k][l],npfs[i][k][l]);
+  array3d_int_reduce_sum_int(`in nf,npfs, `out np);
+}
+
+sub init_particles_circle_xz(`in int np0,int kind,name nf,name xf1,name xf2,name cx,real r0, `out name p,name npfs,name np)
+// np0  : int : minimum required number of particles
+// kind : type of initial density ditribution
+// nf   : [3] int : 3D subdomains grid sizes
+// xf1  : [3][] real : subdomain starts (global coordinates)
+// xf2  : [3][] real : subdomain ends (global coordinates)
+// cx   : [3] real : coordinates of domain center
+// r0   : real : initial distribution parameter: radius
+// p    : [][][] Particle[]: particles
+// npfs : [][][] int : number of particles in subdomains
+// np   : int : total number of particles
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf fill: init_particles_circle_xz_subdomain(`in np0,kind,xf1[0][i],xf1[1][k],xf1[2][l],xf2[0][i],xf2[1][k],xf2[2][l],cx[0],cx[1],cx[2],r0,
+                                                `out p[i][k][l],npfs[i][k][l]);
+  array3d_int_reduce_sum_int(`in nf,npfs, `out np);
+}
+
+sub init_particles_circle_yz(`in int np0,int kind,name nf,name xf1,name xf2,name cx,real r0, `out name p,name npfs,name np)
+// np0  : int : minimum required number of particles
+// kind : type of initial density ditribution
+// nf   : [3] int : 3D subdomains grid sizes
+// xf1  : [3][] real : subdomain starts (global coordinates)
+// xf2  : [3][] real : subdomain ends (global coordinates)
+// cx   : [3] real : coordinates of domain center
+// r0   : real : initial distribution parameter: radius
+// p    : [][][] Particle[]: particles
+// npfs : [][][] int : number of particles in subdomains
+// np   : int : total number of particles
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf fill: init_particles_circle_yz_subdomain(`in np0,kind,xf1[0][i],xf1[1][k],xf1[2][l],xf2[0][i],xf2[1][k],xf2[2][l],cx[0],cx[1],cx[2],r0,
+                                                `out p[i][k][l],npfs[i][k][l]);
+  array3d_int_reduce_sum_int(`in nf,npfs, `out np);
+}
+
+sub init_particles_ball(`in int np0,int kind,name nf,name xf1,name xf2,name cx,real r0, `out name p,name npfs,name np)
+// np0  : int : minimum required number of particles
+// kind : type of initial density ditribution
+// nf   : [3] int : 3D subdomains grid sizes
+// xf1  : [3][] real : subdomain starts (global coordinates)
+// xf2  : [3][] real : subdomain ends (global coordinates)
+// cx   : [3] real : coordinates of domain center
+// r0   : real : initial distribution parameter: radius
+// p    : [][][] Particle[]: particles
+// npfs : [][][] int : number of particles in subdomains
+// np   : int : total number of particles
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf fill: init_particles_ball_subdomain(`in np0,kind,xf1[0][i],xf1[1][k],xf1[2][l],xf2[0][i],xf2[1][k],xf2[2][l],cx[0],cx[1],cx[2],r0,
+                                             `out p[i][k][l],npfs[i][k][l]);
+  array3d_int_reduce_sum_int(`in nf,npfs, `out np);
+}
+
+sub init_particles_velocity_z(`in name nf,name nfs,name nf0,name h,name cx,name dv,int wave,real tau,name fi,name fx,name fy,name fz,name p,name npfs, `out name p_new, `used name used_fi,name used_fxyz,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [] int : subdomains sizes (with borders)
+// nf0      : [] int : subdomains starts (global cell number) (with borders)
+// h        : real : mesh step
+// cx       : [3] real : coordinates of domain center
+// dv       : [3] real : initial distribution parameters: radius, angle and Z velocity dispersions
+// wave     : int : number of waves in initial distribution of particles
+// tau      : real : time step
+// fx,fy,fz : [][][] real[][][] : gravitational forces >> used_fxyz
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// p        : [][][] Particle[]: particles >> used_p
+// npfs     : [][][] int : number of particles in subdomains
+// p_new    : [][][] Particle[]: particles with velocities set
+{
+  df seq,
+     emax0, // [][][] real : maximum potential energy
+     emax;  // real : maximum potential energy
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf maxikl: real1d_reduce_max(`in nfs[0][i]*nfs[1][k]*nfs[2][l],fi[i][k][l], `out emax0[i][k][l]);
+  cf max3d: array3d_real_reduce_max_real(`in nf,emax0, `out emax);
+
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf initpv: init_particles_velocity_z_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                 h[0],h[1],h[2],cx[0],cx[1],cx[2],dv[0],dv[1],dv[2],wave,tau,emax,
+                 fx[i][k][l],fy[i][k][l],fz[i][k][l],fi[i][k][l],npfs[i][k][l],p[i][k][l], `out p_new[i][k][l]) >> (used_fi[i][k][l],used_fxyz[i][k][l],used_p[i][k][l]);
+}
+
+sub init_particles_velocity_y(`in name nf,name nfs,name nf0,name h,name cx,name dv,int wave,real tau,name fi,name fx,name fy,name fz,name p,name npfs, `out name p_new, `used name used_fi,name used_fxyz,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [] int : subdomains sizes (with borders)
+// nf0      : [] int : subdomains starts (global cell number) (with borders)
+// h        : real : mesh step
+// cx       : [3] real : coordinates of domain center
+// dv       : [3] real : initial distribution parameters: radius, angle and Z velocity dispersions
+// wave     : int : number of waves in initial distribution of particles
+// tau      : real : time step
+// fx,fy,fz : [][][] real[][][] : gravitational forces >> used_fxyz
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// p        : [][][] Particle[]: particles >> used_p
+// npfs     : [][][] int : number of particles in subdomains
+// p_new    : [][][] Particle[]: particles with velocities set
+{
+  df seq,
+     emax0, // [][][] real : maximum potential energy
+     emax;  // real : maximum potential energy
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf maxikl: real1d_reduce_max(`in nfs[0][i]*nfs[1][k]*nfs[2][l],fi[i][k][l], `out emax0[i][k][l]);
+  cf max3d: array3d_real_reduce_max_real(`in nf,emax0, `out emax);
+
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf initpv: init_particles_velocity_y_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                 h[0],h[1],h[2],cx[0],cx[1],cx[2],dv[0],dv[1],dv[2],wave,tau,emax,
+                 fx[i][k][l],fy[i][k][l],fz[i][k][l],fi[i][k][l],npfs[i][k][l],p[i][k][l], `out p_new[i][k][l]) >> (used_fi[i][k][l],used_fxyz[i][k][l],used_p[i][k][l]);
+}
+
+sub init_particles_velocity_x(`in name nf,name nfs,name nf0,name h,name cx,name dv,int wave,real tau,name fi,name fx,name fy,name fz,name p,name npfs, `out name p_new, `used name used_fi,name used_fxyz,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [] int : subdomains sizes (with borders)
+// nf0      : [] int : subdomains starts (global cell number) (with borders)
+// h        : real : mesh step
+// cx       : [3] real : coordinates of domain center
+// dv       : [3] real : initial distribution parameters: radius, angle and Z velocity dispersions
+// wave     : int : number of waves in initial distribution of particles
+// tau      : real : time step
+// fx,fy,fz : [][][] real[][][] : gravitational forces >> used_fxyz
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// p        : [][][] Particle[]: particles >> used_p
+// npfs     : [][][] int : number of particles in subdomains
+// p_new    : [][][] Particle[]: particles with velocities set
+{
+  df seq,
+     emax0, // [][][] real : maximum potential energy
+     emax;  // real : maximum potential energy
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf maxikl: real1d_reduce_max(`in nfs[0][i]*nfs[1][k]*nfs[2][l],fi[i][k][l], `out emax0[i][k][l]);
+  cf max3d: array3d_real_reduce_max_real(`in nf,emax0, `out emax);
+
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf initpv: init_particles_velocity_x_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                 h[0],h[1],h[2],cx[0],cx[1],cx[2],dv[0],dv[1],dv[2],wave,tau,emax,
+                 fx[i][k][l],fy[i][k][l],fz[i][k][l],fi[i][k][l],npfs[i][k][l],p[i][k][l], `out p_new[i][k][l]) >> (used_fi[i][k][l],used_fxyz[i][k][l],used_p[i][k][l]);
+}
+
+sub init_particles_velocity_ball(`in name nf,name nfs,name nf0,name h,name cx,name dv,real tau,name fi,name fx,name fy,name fz,name p,name npfs, `out name p_new, `used name used_fi,name used_fxyz,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [] int : subdomains sizes (with borders)
+// nf0      : [] int : subdomains starts (global cell number) (with borders)
+// h        : real : mesh step
+// cx       : [3] real : coordinates of domain center
+// dv       : [3] real : initial distribution parameters: radius, angle and Z velocity dispersions
+// tau      : real : time step
+// fx,fy,fz : [][][] real[][][] : gravitational forces >> used_fxyz
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// p        : [][][] Particle[]: particles >> used_p
+// npfs     : [][][] int : number of particles in subdomains
+// p_new    : [][][] Particle[]: particles with velocities set
+{
+  df //seq,
+     emax0, // [][][] real : maximum potential energy
+     emax;  // real : maximum potential energy
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf maxikl: real1d_reduce_max(`in nfs[0][i]*nfs[1][k]*nfs[2][l],fi[i][k][l], `out emax0[i][k][l]);
+  cf max3d: array3d_real_reduce_max_real(`in nf,emax0, `out emax);
+
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf initpv: init_particles_velocity_ball_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                 h[0],h[1],h[2],cx[0],cx[1],cx[2],dv[0],dv[1],dv[2],tau,emax,
+                 fx[i][k][l],fy[i][k][l],fz[i][k][l],fi[i][k][l],npfs[i][k][l],p[i][k][l], `out p_new[i][k][l]) >> (used_fi[i][k][l],used_fxyz[i][k][l],used_p[i][k][l]);
+}
+
+/*
+sub merge_particles(`in name nf, name p1, name npfs1, name p2, name npfs2, `out name p, name npfs, `used name used_p1, name used_npfs1, name used_p2, name used_npfs2)
+// nf       : [3] int : 3D subdomains grid sizes
+// p1       : [][][] Particle[]: particles >> used_p1
+// npfs1    : [][][] int : number of particles in subdomains
+// p2       : [][][] Particle[]: particles >> used_p2
+// npfs2    : [][][] int : number of particles in subdomains
+// p        : [][][] Particle[]: particles
+// npfs     : [][][] int : number of particles in subdomains
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf merge_p: merge_particles_subdomain(`in p1[i][k][l], npfs1[i][k][l], p2[i][k][l], npfs2[i][k][l], `out p[i][k][l], npfs[i][k][l]) >> (used_p1[i][k][l],used_npfs1[i][k][l],used_p2[i][k][l],used_npfs2[i][k][l]);
+}
+*/
+sub print_particles_seq(`in name nf,name p,name npfs,name prev, `out name next)
+{ df seq;
+  assign(prev,seq[0]);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 let ikl=i*nf[1]*nf[2]+k*nf[2]+l puts_seq("np["+i+"]["+k+"]["+l+"]: "+npfs[i][k][l],seq[ikl],seq[ikl+1]);
+  assign(seq[nf[0]*nf[1]*nf[2]],next);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------
+// Compute subroutines
+// ----------------------------------------------------------------------------------------------------------------------
+
+import c_init_array3d_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,real `hx,real `hy,real `hz, `out name `u) as init_array3d_subdomain;
+import c_density_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,real `hx,real `hy,real `hz,real `am,value `p,int `np, `out name `ro) as density_subdomain;
+
+import c_init_fi_subdomain(`in int `nfx,int `nfy,int `nfz,int `ifx,int `ify,int `ifz,
+              int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,
+              real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `mass, `out name `fi) as init_fi_subdomain;
+
+import c_fi_dobavka_subdomain(`in int `nfx,int `nfy,int `nfz,int `ifx,int `ify,int `ifz,
+                                  int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,real `hx,real `hy,real `hz,real `cx,real `cy,real `cz,real `sm,value `fp, `out name `fi) as fi_dobavka_subdomain;
+
+import c_force_subdomain(`in int `nx,int `ny,int `nz,real `hx,real `hy,real `hz,value `fi, `out name `fx,name `fy,name `fz) as force_subdomain;
+
+import c_move_particles_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,real `hx,real `hy,real `hz,
+              value `fx,value `fy,value `fz,real `tau,int `np,value `p, `out name `pnew) as move_particles_subdomain;
+
+sub init_array3d(`in name nf,name nfs,name nf0,name h, `out name u)
+// nf   : [3] int : 3D subdomains grid sizes
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+// h    : [3] real : mesh steps
+// u    : [][][] real[][][] : fragmented array to be set
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf init_e: init_array3d_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],h[0],h[1],h[2], `out u[i][k][l]);
+}
+
+sub density(`in name nf,name nfs,name nf0,name h,real am,name p,name npfs, `out name ro,name used_p)
+// nf   : [3] int : 3D subdomains grid sizes
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+// h    : [3] real : mesh steps
+// am   : real : single particle mass
+// p    : [][][] Particle[]: particles >> used_p
+// npfs : [][][] int : number of particles in subdomains >> used_p
+// ro   : [][][] real[][][] : density
+{
+  df ro0; // : [][][] real[] : density before exchange
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf dens: density_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],h[0],h[1],h[2],am,p[i][k][l],npfs[i][k][l], `out ro0[i][k][l]) >> (used_p[i][k][l]);
+  cf dex: mesh3d_exchange_sum_27(`in nf,nfs,ro0, `out ro);
+}
+
+sub move_particles(`in name nf,name nfs,name nf0,name h,name xf1,name xf2,name fx,name fy,name fz,real tau,name npfs,name p, `out name npfsnew,name pnew,name used_fxyz,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [3][] int : subdomains sizes (with borders)
+// nf0      : [3][] int : subdomains starts (global cell number) (with borders)
+// h        : [3] real : mesh steps
+// xf1      : [3][] real : subdomain starts (global coordinates)
+// xf2      : [3][] real : subdomain ends (global coordinates)
+// fx,fy,fz : [][][] real[][][] : gravitational forces >> used_fxyz
+// tau      : real : time step
+// npfs     : [][][] int : number of particles in subdomains >> used_p
+// p        : [][][] Particle[]: particles >> used_p
+// npfsnew  : [][][] int : new number of particles in subdomains
+// pnew     : [][][] Particle[]: new particles
+{
+  df pt; // [][][] Particle[] : particles after move before exchange
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf move: move_particles_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],h[0],h[1],h[2],
+               fx[i][k][l],fy[i][k][l],fz[i][k][l],tau,npfs[i][k][l],p[i][k][l], `out pt[i][k][l]) >> (used_fxyz[i][k][l]);
+  cf pex: mesh3d_exchange_particles_27(`in nf,npfs,pt,xf1,xf2, `out npfsnew,pnew, `used used_p);
+}
+
+sub init_poisson(`in name nf,name nfs,name nf0,name h,name cx,real mass, `out name fi)
+// nf   : [3] int : 3D subdomains grid sizes
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+// h    : [3] real : mesh steps
+// cx   : [3] real : coordinates of domain center
+// mass : real : total mass of the gravitating system
+// fi   : [][][] real[][][] : gravitational potential
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf init_fi: init_fi_subdomain(`in nf[0],nf[1],nf[2],i,k,l,nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                                      h[0],h[1],h[2],cx[0],cx[1],cx[2],mass, `out fi[i][k][l]);
+}
+
+sub fi_dobavka(`in name nf,name nfs,name nf0,name h,name cx,real sm,name fp, `out name fi, `used name used_fp)
+// nf   : [3] int : 3D subdomains grid sizes
+// nfs  : [3][] int : subdomains sizes (with borders)
+// nf0  : [3][] int : subdomains starts (global cell number) (with borders)
+// h    : [3] real : mesh steps
+// cx   : [3] real : coordinates of domain center
+// sm   : real : central body mass (sun)
+// fp   : [][][] real[][][] : gravitational potential without addition >> used_fp
+// fi   : [][][] real[][][] : gravitational potential with addition
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf init_fi: fi_dobavka_subdomain(`in nf[0],nf[1],nf[1],i,k,l,
+                                      nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],
+                                      h[0],h[1],h[2],cx[0],cx[1],cx[2],sm,fp[i][k][l], `out fi[i][k][l]) >> (used_fp[i][k][l]);
+}
+
+sub force(`in name nf,name nfs,name h,name fi, `out name fx,name fy,name fz, `used name used_fi)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [3][] int : subdomains sizes (with borders)
+// h        : [3] real : mesh steps
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// fx,fy,fz : [][][] real[][][] : gravitational forces
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf frc: force_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],h[0],h[1],h[2],fi[i][k][l], `out fx[i][k][l],fy[i][k][l],fz[i][k][l]) >> (used_fi[i][k][l]);
+}
+
+//-----------------------------------------------------------------------------
+// Writing logs
+//-----------------------------------------------------------------------------
+
+import c_get_properties_subdomain(`in int `nx,int `ny,int `nz,int `sx,int `sy,int `sz,real `hx,real `hy,real `hz,
+         real `cx,real `cy,real `cz,real `sm,value `fi,value `p,int `np, `out name `prop) as get_properties_subdomain;
+import c_get_properties_finish(`in real `am,real `pm,value `prop0, `out name `prop) as get_properties_finish;
+import c_print_properties_seq(`in string `filename,value `prop,int `it,real `cx,real `cy,real `cz,value `prev, `out name `next) as print_properties_seq;
+
+//import c_write_particles_part_subdomain(`in string `filename,int `np,value `p,value `prev, `out name next) as write_particles_part_subdomain;
+//import c_write_particles_subdomain(`in string `filename,int `np,value `p) as write_particles_subdomain;
+
+/*
+sub log_particles_used(`in string str,int it,name nf,name npfs,name p, `used name used_p)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// npfs : [][][] int : number of particles in subdomains
+// p    : [][][] Particle[]: particles >> used_p
+{
+  df filename,seq;
+  cf wr0: assign_int(`in 0, `out seq[0]);
+  cf wr1: sprintf_d(filename,str+"%06d.dat",it);
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 
+    let ikl = i*nf[1]*nf[2]+k*nf[2]+l
+      cf wrt: write_particles_part_subdomain(`in filename,npfs[i][k][l],p[i][k][l],seq[ikl], `out seq[ikl+1]) >> (used_p[i][k][l]);
+}
+sub log_particles_split_used(`in string str,int it,name nf,name npfs,name p, `used name used_p)
+// str : string : part of file name
+// it  : int : time step number
+// nf  : [3] int : 3D subdomains grid sizes
+// npfs : [][][] int : number of particles in subdomains
+// p    : [][][] Particle[]: particles >> used_p
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  { df filename;
+    cf wr0: sprintf_dddd(filename,str+"%06d_%03d_%03d_%03d.dat",it,i,k,l);
+    cf wr1: write_particles_subdomain(`in filename,npfs[i][k][l],p[i][k][l]) >> (used_p[i][k][l]);
+  }
+}
+*/
+
+sub get_properties(`in name nf,name nfs,name nf0,name h,name cx,real am,real pm,real sm,name fi,name p,name npfs, `out name prop, `used name used_fi,name used_p)
+// nf       : [3] int : 3D subdomains grid sizes
+// nfs      : [3][] int : subdomains sizes (with borders)
+// nf0      : [3][] int : subdomains starts (global cell number) (with borders)
+// h        : [3] real : mesh steps
+// cx       : [3] real : coordinates of domain center
+// am       : real : single particle mass
+// pm       : real : particles total mass
+// sm       : real : central (sun) mass
+// fi       : [][][] real[][][] : gravitational potential >> used_fi
+// p        : [][][] real[][6]: particles >> used_p
+// npfs     : [][][] int : number of particles in subdomains >> used_p
+// prop     : real[13] : particles properties
+{ df pr0, // : [][][] real[13] : particles properties
+     pr1; // : real[13] : particles properties
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+    cf getpr0: get_properties_subdomain(`in nfs[0][i],nfs[1][k],nfs[2][l],nf0[0][i],nf0[1][k],nf0[2][l],h[0],h[1],h[2],cx[0],cx[1],cx[2],
+                                            sm,fi[i][k][l],p[i][k][l],npfs[i][k][l], `out pr0[i][k][l]) >> (used_fi[i][k][l],used_p[i][k][l]);
+  cf getpr1: array3d_real1d_reduce_sum_real1d(`in nf,13,pr0, `out pr1);
+  cf getpr2: get_properties_finish(`in am,pm,pr1, `out prop);
+}
+
+//-----------------------------------------------------------------------------
+// Other CFs
+//-----------------------------------------------------------------------------
+
+import c_print_x(`in int `ifx,int `nx,int `sx,real `hx) as print_x;
+import c_print_y(`in int `ify,int `ny,int `sy,real `hy) as print_y;
+import c_print_z(`in int `ifz,int `nz,int `sz,real `hz) as print_z;
+
+import c_print_x_seq(`in int `ifx,int `nx,int `sx,real `hx,value `prev, `out name `next) as print_x_seq;
+import c_print_y_seq(`in int `ify,int `ny,int `sy,real `hy,value `prev, `out name `next) as print_y_seq;
+import c_print_z_seq(`in int `ifz,int `nz,int `sz,real `hz,value `prev, `out name `next) as print_z_seq;
+
+sub free3d_if1(`in name nf,name a3d,name df_check)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf free: empty(`in df_check) --> (a3d[i][k][l]);
+}
+
+sub empty3d_0(`in name nf, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty0() >> (v[i][k][l]);
+}
+
+sub empty3d_1(`in name nf,name v1, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty1(`in v1[i][k][l]) >> (v[i][k][l]);
+}
+
+sub empty3d_2(`in name nf,name v1,name v2, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty2(`in v1[i][k][l],v2[i][k][l]) >> (v[i][k][l]);
+}
+
+sub empty3d_3(`in name nf,name v1,name v2,name v3, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty3(`in v1[i][k][l],v2[i][k][l],v3[i][k][l]) >> (v[i][k][l]);
+}
+sub empty3d_4(`in name nf,name v1,name v2,name v3,name v4, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty4(`in v1[i][k][l],v2[i][k][l],v3[i][k][l],v4[i][k][l]) >> (v[i][k][l]);
+}
+sub empty3d_5(`in name nf,name v1,name v2,name v3,name v4,name v5, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty5(`in v1[i][k][l],v2[i][k][l],v3[i][k][l],v4[i][k][l],v5[i][k][l]) >> (v[i][k][l]);
+}
+sub empty3d_6(`in name nf,name v1,name v2,name v3,name v4,name v5,name v6, `out name v)
+{
+  for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 cf emp: empty6(`in v1[i][k][l],v2[i][k][l],v3[i][k][l],v4[i][k][l],v5[i][k][l],v6[i][k][l]) >> (v[i][k][l]);
+}
+
+//================================================================================================================================================
+
+sub main(string args)
+{
+  df nt,          // int : total number of time steps
+     nts0,nts,    // int : number of time steps between logs 
+     n,           // [3] int : 3D mesh sizes
+     nf,          // [3] int : 3D subdomains grid sizes
+     nfs,         // [3][] int : subdomains sizes (with borders)
+     nf0,         // [3][] int : subdomains starts (global cell number) (with borders)
+     np0,         // int : minimum required number of particles
+     np,          // int : total number of particles
+     npfs,        // [nt] [][][] int : number of particles in subdomains
+     p,pt,px,     // [nt] [][][] real[][6] double: particles
+     ro,          // [][][] real[][][] : density
+     fi0,         // [][][] real[][][] : initial gravitational potential
+     fp,fi,       // [nt] [][][] real[][][] : gravitational potential
+     fx,fy,fz,    // [nt] [][][] real[][][] : gravitational forces
+     xn,          // [3] real : domain sizes
+     cx,          // [3] real : coordinates of domain centre
+     xf1,         // [3][*] real : subdomain starts (global coordinates) (without borders)
+     xf2,         // [3][*] real : subdomain ends (global coordinates) (without borders)
+     pm,          // real : particles total mass
+     am,          // real : single particle mass
+     sm,          // real : central (sun) mass
+     r0,          // real : initial distribution parameter: radius
+     dv,          // [3] real : initial particles distribution parameters: radius, angle and Z velocity dispersions
+     eps,         // real : Poisson solver precision
+     wp,          // real : Poisson solver acceleration parameter
+     h,           // [3] real : mesh step
+     tau,         // real : time step
+     count,       // [] int : total number of Poisson solver iterations
+     prop,        // [] Properties : properties of particles system
+     seq,seqlog,seqplt,
+     used_px_density,used_fi0_poisson,used_px_velocity,used_fi_velocity,used_fxyz_velocity,
+     used_p_density,used_p_move,used_fxyz_move,
+     used_fp_poisson,used_fp_dobavka,used_fi_force,
+     used_fi_prop,used_p_prop,
+     used_ro_log,
+     ready_it,
+     used_fi_log,used_fp_log,used_fx_log,used_fy_log,used_fz_log,used_p_log;
+
+  // parameters initialization
+  cf initpar: init_parameters(`in args, `out nt,nts0,np0, n, nf, xn, tau,pm,sm,r0, dv, eps,wp);
+  cf printpar: print_parameters(`in nt,nts0,np0, n[0],n[1],n[2], nf[0],nf[1],nf[2], xn[0],xn[1],xn[2], tau,pm,sm,r0, dv[0],dv[1],dv[2], eps,wp);
+// was here /*
+  if (nts0 != 0) assign_int(`in nts0, `out nts);
+  if (nts0 == 0) assign_int(`in nt+1, `out nts);
+
+  cf init_h0: assign_real(`in xn[0]/n[0], `out h[0]);
+  cf init_h1: assign_real(`in xn[1]/n[1], `out h[1]);
+  cf init_h2: assign_real(`in xn[2]/n[2], `out h[2]);
+  cf init_cx0: assign_real(`in xn[0]/2.0, `out cx[0]);
+  cf init_cx1: assign_real(`in xn[1]/2.0, `out cx[1]);
+  cf init_cx2: assign_real(`in xn[2]/2.0, `out cx[2]);
+  cf init_am: assign_real(`in pm/np, `out am);
+
+  // make fragmentation
+  cf frag_mesh: make_mesh3d_fragmentation(`in n,nf,1, `out nfs,nf0);
+
+  assign_int(`in 1, `out seq[0]);
+  assign_int(`in 1, `out ready_it[0-1]);
+
+  //print_mesh3d_fragmentation_seq(`in n,nf,nfs,nf0,seq[0],seq[3]);
+
+  cf frag_sub0: init_subdomains_parameters(`in nf[0],nfs[0],nf0[0],h[0], `out xf1[0],xf2[0]);
+  cf frag_sub1: init_subdomains_parameters(`in nf[1],nfs[1],nf0[1],h[1], `out xf1[1],xf2[1]);
+  cf frag_sub2: init_subdomains_parameters(`in nf[2],nfs[2],nf0[2],h[2], `out xf1[2],xf2[2]);
+
+//  print_subdomains_parameters_seq(nf[0],xf1[0],xf2[0],seq[3],seq[4]);
+//  print_subdomains_parameters_seq(nf[1],xf1[1],xf2[1],seq[4],seq[5]);
+//  print_subdomains_parameters_seq(nf[2],xf1[2],xf2[2],seq[5],seq[6]);
+  //cf pxyz: print_xyz_seq(`in nf,nfs,nf0,h,seq[6], `out seq[7]);
+
+  gnuplot_script_init("dopng.plt",seqplt[0]);
+
+  // data initialization
+  //cf initp: init_particles_uniform(`in np0,nf,xf1,xf2,cx,r0,dv, `out p[0],npfs[0],np);
+  cf initp: init_particles_circle_yz(`in np0,$FILL_CONST,nf,xf1,xf2,cx,r0, `out px,npfs[0],np);
+  //cf initp: init_particles_ball(`in np0,$FILL_CONST,nf,xf1,xf2,cx,r0, `out px,npfs[0],np);
+  //print_particles_seq(nf,px,npfs[0],seq[1],seq[2]);
+
+  if (np0 != np) puts("Actual number of particles: "+np);
+
+  cf dens0: density(`in nf,nfs,nf0,h,am,px,npfs[0], `out ro[0], `used used_px_density);
+  cf ipoi: init_poisson(`in nf,nfs,nf0,h,cx,pm, `out fi0);
+  cf poi0: poisson3d_solve_explicit(`in nf,nfs,h,wp,eps,4*$PI,1,ro[0],fi0, `out fp[0],count[0], `used used_fi0_poisson);
+  cf pad0: fi_dobavka(`in nf,nfs,nf0,h,cx,sm,fp[0], `out fi[0], `used used_fp_dobavka[0]);
+
+  puts("Poisson ["+0+"] : "+count[0]);
+  cf frc0: force(`in nf,nfs,h,fi[0], `out fx[0],fy[0],fz[0], `used used_fi_force[0]);
+  cf initv: init_particles_velocity_x(`in nf,nfs,nf0,h,cx,dv,0,tau,fi[0],fx[0],fy[0],fz[0],px,npfs[0], `out p[0], `used used_fi_velocity,used_fxyz_velocity,used_px_velocity) >> (ready_it[0]);
+  //cf initv: init_particles_velocity_ball(`in nf,nfs,nf0,h,cx,dv,tau,fi[0],fx[0],fy[0],fz[0],px,npfs[0], `out p[0], `used used_fi_velocity,used_fxyz_velocity,used_px_velocity) >> (ready_it[0]);
+// was here /*
+  let it = 0
+  {
+    cf prop0: get_properties(`in nf,nfs,nf0,h,cx,am,pm,sm,fi[it],p[it],npfs[it], `out prop[it], `used used_fi_prop[0],used_p_prop[0]);
+    cf pprn0: print_properties_seq(`in "log.txt",prop[it],it,cx[0],cx[1],cx[2],seq[0], `out seqlog[0]) --> (prop[it]);
+
+    if (nts0!=0)
+    { df used_ro, seqplt0;
+      cf cp1: copy(`in seqplt[0],seqplt0[0]) --> (seqplt[0]);
+
+      log_xy_plt_used(`in "ro_xy",it,n,nf,nfs,nf0,1,ro[it],n[2]/2,"dopng.plt",seqplt0[ 0], `out seqplt0[ 1], `used used_ro[0]);
+      log_xz_plt_used(`in "ro_xz",it,n,nf,nfs,nf0,1,ro[it],n[1]/2,"dopng.plt",seqplt0[ 1], `out seqplt0[ 2], `used used_ro[1]);
+      log_yz_plt_used(`in "ro_yz",it,n,nf,nfs,nf0,1,ro[it],n[0]/2,"dopng.plt",seqplt0[ 2], `out seqplt0[ 3], `used used_ro[2]);
+      cf use: empty3d_3(`in nf,used_ro[0],used_ro[1],used_ro[2], `out used_ro_log[0]);
+      //cf no_use_ro: empty3d_0(`in nf, `out used_ro_log[0]);
+
+      //log_xy_split_plt_used(`in "fp_xy",it,nf,nfs,nf0,fp[it],n[2]/2,"dopng.plt",seqplt0[ 3], `out seqplt0[ 4], `used used_fp_log[0]);
+      //log_xy_plt_used(`in "fp_xy",it,n,nf,nfs,nf0,1,fp[it],n[2]/2,"dopng.plt",seqplt0[ 3], `out seqplt0[ 4], `used used_fp_log[0]);
+      cf no_use_fp: empty3d_0(`in nf, `out used_fp_log[0]);
+
+      //log_xy_split_plt_used(`in "fi_xy",it,nf,nfs,nf0,fi[it],n[2]/2,"dopng.plt",seqplt0[ 4], `out seqplt0[ 5], `used used_fi_log[0]);
+      //log_xy_plt_used(`in "fi_xy",it,n,nf,nfs,nf0,1,fi[it],n[2]/2,"dopng.plt",seqplt0[ 4], `out seqplt0[ 5], `used used_fi_log[0]);
+      cf no_use_fi: empty3d_0(`in nf, `out used_fi_log[0]);
+
+      //log_xy_split_plt_used(`in "fx_xy",it,nf,nfs,nf0,fx[it],n[2]/2,"dopng.plt",seqplt0[ 5], `out seqplt0[ 6], `used used_fx_log[0]);
+      //log_xy_plt_used(`in "fx_xy",it,n,nf,nfs,nf0,1,fx[it],n[2]/2,"dopng.plt",seqplt0[ 5], `out seqplt0[ 6], `used used_fx_log[0]);
+      cf no_use_fx: empty3d_0(`in nf, `out used_fx_log[0]);
+
+      //log_xy_split_plt_used(`in "fy_xy",it,nf,nfs,nf0,fy[it],n[2]/2,"dopng.plt",seqplt0[ 6], `out seqplt0[ 7], `used used_fy_log[0]);
+      //log_xy_plt_used(`in "fy_xy",it,n,nf,nfs,nf0,1,fy[it],n[2]/2,"dopng.plt",seqplt0[ 6], `out seqplt0[ 7], `used used_fy_log[0]);
+      cf no_use_fy: empty3d_0(`in nf, `out used_fy_log[0]);
+
+      //log_xy_split_plt_used(`in "fz_xy",it,nf,nfs,nf0,fz[it],n[2]/2,"dopng.plt",seqplt0[ 7], `out seqplt0[ 8], `used used_fz_log[0]);
+      //log_xy_plt_used(`in "fz_xy",it,n,nf,nfs,nf0,1,fz[it],n[2]/2,"dopng.plt",seqplt0[ 7], `out seqplt0[ 8], `used used_fz_log[0]);
+      cf no_use_fz: empty3d_0(`in nf, `out used_fz_log[0]);
+
+      //log_particles_used(`in "p",it,nf,npfs[it],p[it], `used used_p_log[0]);
+      cf no_use_p: empty3d_0(`in nf, `out used_p_log[0]);
+
+      //cf cp2: copy(`in seqplt0[0], `out seqplt[3]);
+      cf cp2: copy(`in seqplt0[3], `out seqplt[3]);
+      //cf cp2: copy(`in seqplt0[8], `out seqplt[3]);
+    }
+    if (nts0==0)
+    { cf no_cpy: copy(`in seqplt[0], `out seqplt[3]) --> (seqplt[0]);
+      cf no_use_ro: empty3d_0(`in nf, `out used_ro_log[0]);
+      cf no_use_fp: empty3d_0(`in nf, `out used_fp_log[0]);
+      cf no_use_fi: empty3d_0(`in nf, `out used_fi_log[0]);
+      cf no_use_fx: empty3d_0(`in nf, `out used_fx_log[0]);
+      cf no_use_fy: empty3d_0(`in nf, `out used_fy_log[0]);
+      cf no_use_fz: empty3d_0(`in nf, `out used_fz_log[0]);
+      cf no_use_p: empty3d_0(`in nf, `out used_p_log[0]);
+    }
+  }
+// was here /*
+  // free
+  if (nt!=0) for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1
+  {
+    cf free_px: empty2(`in used_px_density[i][k][l],used_px_velocity[i][k][l]) --> (px[i][k][l], used_px_density[i][k][l],used_px_velocity[i][k][l]);
+    cf free_fi0: empty1(`in used_fi0_poisson[i][k][l]) --> (fi0[i][k][l], used_fi0_poisson[i][k][l]);
+    cf free_fi_0: empty4(`in used_fi_force[0][i][k][l],used_fi_velocity[i][k][l],used_fi_prop[0][i][k][l],used_fi_log[0][i][k][l]) --> (fi[0][i][k][l], used_fi_force[0][i][k][l],used_fi_velocity[i][k][l],used_fi_prop[0][i][k][l],used_fi_log[0][i][k][l]);
+
+	cf free_fxyz_0: empty5(
+		`in used_fxyz_velocity[i][k][l],
+		used_fxyz_move[0][i][k][l],
+		used_fx_log[0][i][k][l],
+		used_fy_log[0][i][k][l],
+		used_fz_log[0][i][k][l]
+	) --> (
+		fx[0][i][k][l],
+		fy[0][i][k][l],fz[0][i][k][l],
+		used_fxyz_velocity[i][k][l],
+		used_fxyz_move[0][i][k][l],
+		used_fx_log[0][i][k][l],
+		used_fy_log[0][i][k][l],
+		used_fz_log[0][i][k][l]
+	);
+
+//    cf free_p_0: empty3(`in used_p_prop[0][i][k][l],used_p_move[0][i][k][l],used_p_log[0][i][k][l]) --> (p[0][i][k][l],npfs[0][i][k][l], used_p_prop[0][i][k][l],used_p_move[0][i][k][l],used_p_log[0][i][k][l]);
+//    cf free_ro_fp_0: empty4(`in used_ro_log[0][i][k][l],used_fp_dobavka[0][i][k][l],used_fp_poisson[0][i][k][l],used_fp_log[0][i][k][l]) --> (ro[0][i][k][l], used_ro_log[0][i][k][l], fp[0][i][k][l], used_fp_dobavka[0][i][k][l],used_fp_poisson[0][i][k][l],used_fp_log[0][i][k][l]);
+  }
+/*
+  //cf mem0: ready_print_memory_usage(`in ready_it[0]);
+
+  for it=0..nt-1 if (ready_it[it-1])
+  {
+    df cnt;
+    cf move: move_particles(`in nf,nfs,nf0,h,xf1,xf2,fx[it],fy[it],fz[it],tau,npfs[it],p[it], `out npfs[it+1],p[it+1], `used used_fxyz_move[it],used_p_move[it]);
+    cf dens: density(`in nf,nfs,nf0,h,am,p[it+1],npfs[it+1], `out ro[it+1], `used used_p_density[it+1]);
+    cf pois: poisson3d_solve_explicit(`in nf,nfs,h,wp,eps,4*$PI,1,ro[it+1],fp[it], `out fp[it+1],cnt, `used used_fp_poisson[it]);
+    cf padd: fi_dobavka(`in nf,nfs,nf0,h,cx,sm,fp[it+1], `out fi[it+1], `used used_fp_dobavka[it+1]);
+    puts("Poisson ["+int(it+1)+"] : "+cnt);
+    assign_int(`in count[it]+cnt, `out count[it+1]);
+    cf forc: force(`in nf,nfs,h,fi[it+1], `out fx[it+1],fy[it+1],fz[it+1], `used used_fi_force[it+1]) >> (ready_it[it+1]);
+
+    cf prop: get_properties(`in nf,nfs,nf0,h,cx,am,pm,sm,fi[it+1],p[it+1],npfs[it+1], `out prop[it+1], `used used_fi_prop[it+1],used_p_prop[it+1]);
+    cf pprn: print_properties_seq(`in "log.txt",prop[it+1],it+1,cx[0],cx[1],cx[2],seqlog[it], `out seqlog[it+1]) --> (prop[it]);
+
+    //cf mem: ready_print_memory_usage(`in ready_it[it+1]);
+
+    if ((it+1)%nts == 0)
+    { df used_ro;
+      let itplt = 3*((it+1)/nts)
+      { log_xy_plt_used(`in "ro_xy",it+1,n,nf,nfs,nf0,1,ro[it+1],n[2]/2,"dopng.plt",seqplt[itplt  ], `out seqplt[itplt+1], `used used_ro[0]);// --> (seqplt[itplt  ]);
+        log_xz_plt_used(`in "ro_xz",it+1,n,nf,nfs,nf0,1,ro[it+1],n[1]/2,"dopng.plt",seqplt[itplt+1], `out seqplt[itplt+2], `used used_ro[1]);// --> (seqplt[itplt+1]);
+        log_yz_plt_used(`in "ro_yz",it+1,n,nf,nfs,nf0,1,ro[it+1],n[0]/2,"dopng.plt",seqplt[itplt+2], `out seqplt[itplt+3], `used used_ro[2]);// --> (seqplt[itplt+2]);
+      }
+      cf use: empty3d_3(`in nf,used_ro[0],used_ro[1],used_ro[2], `out used_ro_log[it+1]);
+    }
+    if ((it+1)%nts != 0) cf use: empty3d_0(`in nf, `out used_ro_log[it+1]);
+
+    // free
+    for i=0..nf[0]-1 for k=0..nf[1]-1 for l=0..nf[2]-1 if (it != 0)
+    {
+      cf free_fxyz: empty(`in used_fxyz_move[it][i][k][l]) --> (fx[it][i][k][l],fy[it][i][k][l],fz[it][i][k][l], used_fxyz_move[i][k][l]);
+      cf free_fi: empty2(`in used_fi_force[it][i][k][l],used_fi_prop[it][i][k][l]) --> (fi[it][i][k][l], used_fi_force[it][i][k][l],used_fi_prop[it][i][k][l]);
+      cf free_p: empty3(`in used_p_density[it][i][k][l],used_p_prop[it][i][k][l],used_p_move[it][i][k][l]) --> (p[it][i][k][l],npfs[it][i][k][l], used_p_density[it][i][k][l],used_p_prop[it][i][k][l],used_p_move[it][i][k][l]);
+      cf free_ro_fp: empty3(`in used_ro_log[it][i][k][l],used_fp_dobavka[it][i][k][l],used_fp_poisson[it][i][k][l]) --> (ro[it][i][k][l], used_ro_log[it][i][k][l], fp[it][i][k][l], used_fp_dobavka[it][i][k][l],used_fp_poisson[it][i][k][l]);
+    }
+  }
+
+  puts("Solver iterations : "+count[nt]);
+  */
+}
