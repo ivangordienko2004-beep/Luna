@@ -1,0 +1,11 @@
+/*
+ String data type.
+*/
+
+import c_hello(string) as hello;
+
+sub main()
+{
+	for i=1..5
+		hello("User_"+i+"_name");
+}

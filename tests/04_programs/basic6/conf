@@ -1,0 +1,3 @@
+RUN=luna -q test.fa anonymous turtle
+RETCODE=0
+STDOUT_MATCH=Hello, turtle!

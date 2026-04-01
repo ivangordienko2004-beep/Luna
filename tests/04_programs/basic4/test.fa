@@ -1,0 +1,22 @@
+/*
+ Int and real data types and type conversions.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+import c_rprint(real) as rprint;
+
+sub main()
+{
+	cf a: rprint(5.6) @ {locator_cyclic: 6;};
+
+	cf b: rprint(80) @ {locator_cyclic: 5;};
+
+	cf c: iprint(3.7) @ {locator_cyclic: 4;};
+
+	cf d: rprint(int(7.1)) @ {locator_cyclic: 3;};
+
+	iprint(5/2) @ {locator_cyclic: 2;};
+	rprint(5/2.0) @ {locator_cyclic: 1;};
+}
+

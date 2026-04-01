@@ -1,0 +1,39 @@
+/*
+ Subroutines and passing of arguments.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+
+sub initialize(name x, int val)
+{
+	cf d: init(val, x[6]) @ {
+		req_count x[6]=2;
+		locator_cyclic: 0;
+	}; 
+} @ {
+	locator_cyclic x[i]=>1;
+}
+
+sub display(name y, int idx)
+{
+	cf c: iprint(y[idx*2][6]) @ {
+		request y[idx*2][6];
+		locator_cyclic: 0;
+	};
+} @ {
+	locator_cyclic y[i][j]=>1;
+}
+
+sub main()
+{
+	df z;
+	cf a: initialize(z[10], 5)@{locator_cyclic: 0;};
+	cf b: display(z, z[10][6]) @ {
+		request z[10][6];
+		locator_cyclic: 0;
+	};
+} @ {
+	locator_cyclic z[i][j]=>1;
+}
+

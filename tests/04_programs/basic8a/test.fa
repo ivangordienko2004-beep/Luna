@@ -1,0 +1,10 @@
+/*
+ Hello world example.
+*/
+
+import helloworld();
+
+sub main()
+{
+	helloworld();
+}

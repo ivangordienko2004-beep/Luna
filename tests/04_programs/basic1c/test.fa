@@ -1,0 +1,27 @@
+#!/usr/bin/luna
+/*
+ Initialization of data fragments and data dependencies.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+
+sub main()
+{
+	df x;
+
+	cf a: init(7, x[4]) @ {
+		locator_cyclic: 1;
+//		req_unlimited x[4];
+	};
+
+	iprint(x[2+2]) @ {
+//		request x[2*2];
+		locator_cyclic: 2;
+		delete x[2*2];
+	};
+
+} @ {
+	locator_cyclic x[i] => 3;
+}
+

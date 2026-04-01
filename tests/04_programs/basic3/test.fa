@@ -1,0 +1,18 @@
+/*
+ Data dependencies and indexed data fragments.
+*/
+
+import c_init(int, name) as init;
+import c_iprint(int) as iprint;
+
+sub main()
+{
+	df x;
+	cf a: iprint(x[10][4]) @ { wait x[10][4]; };
+	cf b: init(5, x[10][2+2]) @ { afterpush x[10][2+2] => a; };
+} @ {
+	locator_cyclic a=>0;
+	locator_cyclic b=>1;
+	locator_cyclic x[i][j]=>i+j;
+
+}

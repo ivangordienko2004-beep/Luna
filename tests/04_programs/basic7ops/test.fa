@@ -1,0 +1,12 @@
+/*
+ String data type.
+*/
+
+import c_hello(string) as hello;
+sub main()
+{
+	for i=1..5
+		for j=1..5
+			if ((i > 1 && i < 5) && (j > 4 || j + 1 < 2)) {
+			hello("User_"+i+"_name_"+j+""); }
+}

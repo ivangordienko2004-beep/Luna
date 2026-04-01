@@ -1,0 +1,14 @@
+#!/usr/bin/luna
+/*
+ String data type.
+*/
+
+import c_hello(string) as hello;
+
+sub main(string arg1, string arg2)
+{
+	hello(arg1)@{locator_cyclic:0;};
+	hello(arg2)@{locator_cyclic:0;};
+	hello("User")@{locator_cyclic:0;};
+	hello("Master")@{locator_cyclic:0;};
+}
