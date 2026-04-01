@@ -1,0 +1,4 @@
+RUN=luna
+RETCODE=1
+STDERR_MATCH=luna: fatal error: no program specified
+STDOUT_EMPTY

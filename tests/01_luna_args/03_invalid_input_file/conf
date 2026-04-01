@@ -1,0 +1,4 @@
+RUN=luna -q some_missing_file
+RETCODE=1
+STDERR_MATCH=fatal error: failed to read
+STDOUT_EMPTY

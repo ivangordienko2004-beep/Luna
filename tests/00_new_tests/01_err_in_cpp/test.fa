@@ -1,0 +1,5 @@
+#!/usr/bin/luna
+
+C++ sub main() ${<%%%}
+{this won't compile
+}%%%

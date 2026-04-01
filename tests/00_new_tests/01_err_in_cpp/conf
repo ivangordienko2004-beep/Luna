@@ -1,0 +1,3 @@
+RUN=luna -q test.fa
+RETCODE=1
+STDERR_MATCH=test.fa:3:9

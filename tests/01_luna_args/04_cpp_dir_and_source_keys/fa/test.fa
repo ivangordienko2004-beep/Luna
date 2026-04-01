@@ -1,0 +1,12 @@
+import c_helloworld1() as hello_world1;
+import c_helloworld2() as hello_world2;
+import c_helloworld3() as hello_world3;
+import c_helloworld4() as hello_world4;
+
+sub main()
+{
+	hello_world1();
+	hello_world2();
+	hello_world3();
+	hello_world4();
+}
